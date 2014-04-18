@@ -1,7 +1,7 @@
 {
-    "name": "blacksmith/helper",
+    "name": "database/helper",
     "description": "Helper package to assist in the creation of files by blacksmith.",
-    "keywords":["blacksmith"],
+    "keywords":["database"],
     "homepage": "http://indatus.com/",
     "license": "MIT",
     "authors": [
