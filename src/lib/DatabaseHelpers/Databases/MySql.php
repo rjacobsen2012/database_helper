@@ -1,20 +1,18 @@
-<?php namespace DatabaseHelpers;
+<?php namespace DatabaseHelpers\Databases;
 
-use Illuminate\Database\Eloquent\Model;
 use DB\DBInterface;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 /**
- * Class LaravelHelper
+ * Class DatabaseHelper
  *
  * @package DatabaseHelpers
  */
-class LaravelHelper implements DBInterface
+class MySql implements DBInterface
 {
 
     /**
-     * @var \Illuminate\Database\Eloquent\Model $model
-     *
      * @access protected
      */
     protected $model;
@@ -32,6 +30,11 @@ class LaravelHelper implements DBInterface
     /**
      * @access protected
      */
+    protected $dbConnection;
+
+    /**
+     * @access protected
+     */
     protected $properties = [];
 
     /**
@@ -40,20 +43,74 @@ class LaravelHelper implements DBInterface
     protected $methods = [];
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param Model                 $model
+     * @param Database Connection   $dbConnection
      *
      * @access public
      */
-    public function __construct(Model $model)
+    public function __construct($model, $dbConnection)
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        $this->model = $model;
-
-        $this->table = $this->getModelTable();
-        $this->schema = $this->getTableSchemaManager();
+        $this->model = strtolower($model);
+        $this->dbConnection = $dbConnection;
         $columns = $this->getTableColumns();
 
         $this->filterTableColumns($this->model, $columns);
+    }
+
+    /**
+     * @param $query
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function dbQuery($query)
+    {
+
+        mysql_connect(
+            $this->dbConnection['hostname'],
+            $this->dbConnection['user'],
+            $this->dbConnection['password']
+        );
+
+        mysql_select_db($this->dbConnection['database']);
+
+        return mysql_query($query);
+
+    }
+
+    /**
+     * @param $table
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function getTableColumns()
+    {
+
+        $result = $this->dbQuery("SHOW COLUMNS FROM sometable");
+
+        if (!$result) {
+
+            echo 'Could not run query: ' . mysql_error();
+
+            exit;
+
+        }
+
+
+
+        if (mysql_num_rows($result) > 0) {
+
+            while ($row = mysql_fetch_assoc($result)) {
+
+                $this->addProperty($row['Field'], $row['Type'], true, true);
+
+            }
+
+        }
+
     }
 
 
@@ -93,13 +150,12 @@ class LaravelHelper implements DBInterface
     }
 
     /**
-     * @access private
+     * @access public
      */
     public function getModelTable()
     {
 
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        return $this->model->getTable();
+        return null;
 
     }
 
@@ -110,30 +166,19 @@ class LaravelHelper implements DBInterface
      */
     public function getModelTablePrefix()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        return $this->model->getConnection()->getTablePrefix;
+        return null;
     }
 
     /**
+     * @param $table
+     *
      * @access public
      *
      * @return mixed
      */
     public function getTableSchemaManager()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        return $this->model->getConnection()->getDoctrineSchemaManager($this->table);
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getTableColumns()
-    {
-        $this->schema->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        return $this->schema->listTableColumns($this->table);
+        return null;
     }
 
     /**
@@ -143,8 +188,7 @@ class LaravelHelper implements DBInterface
      */
     public function getModelDates()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        return $this->model->getDates();
+        return null;
     }
 
     /**
@@ -157,15 +201,13 @@ class LaravelHelper implements DBInterface
     public function filterTableColumns($columns)
     {
 
-        if ($columns) {
+        if (mysql_num_rows($columns) > 0) {
 
-            $modelDates = $this->getModelDates($this->model);
-
-            foreach ($columns as $column) {
+            while ($column = mysql_fetch_assoc($columns)) {
 
                 $name = $this->getColumnName($column);
 
-                if (in_array($name, $modelDates)) {
+                if ($this->isColumnDate($column)) {
 
                     $type = '\Carbon\Carbon';
 
@@ -177,7 +219,7 @@ class LaravelHelper implements DBInterface
 
                 $this->addProperty($name, $type, true, true);
 
-                $this->addMethod(Str::camel("where_".$name), $this->getModelClass($this->model), array('$value'));
+                $this->addMethod(Str::camel("where_".$name), null, array('$value'));
 
             }
 
@@ -194,7 +236,27 @@ class LaravelHelper implements DBInterface
      */
     public function getColumnName($column)
     {
-        return $column->getName();
+        return $column['Field'];
+    }
+
+    /**
+     * @param $column
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function isColumnDate($column)
+    {
+        $type = $column['Type'];
+
+        if (strpos($type, 'date') !== false || strpos($type, 'time') !== false) {
+
+            return true;
+
+        }
+
+        return false;
     }
 
     /**
@@ -229,32 +291,39 @@ class LaravelHelper implements DBInterface
      */
     public function filterTableFieldType($type)
     {
-        switch ($type) {
-            case 'string':
-            case 'text':
-            case 'date':
-            case 'time':
-            case 'guid':
-            case 'datetimetz':
-            case 'datetime':
-                return 'string';
-                break;
-            case 'integer':
-            case 'bigint':
-            case 'smallint':
-                return 'integer';
-                break;
-            case 'decimal':
-            case 'float':
-                return 'float';
-                break;
-            case 'boolean':
-                return 'boolean';
-                break;
-            default:
-                return 'mixed';
-                break;
+
+        if (strpos($type, 'string') !== false ||
+            strpos($type, 'text') !== false ||
+            strpos($type, 'date') !== false ||
+            strpos($type, 'time') !== false ||
+            strpos($type, 'guid') !== false ||
+            strpos($type, 'datetimetz') !== false ||
+            strpos($type, 'datetime') !== false) {
+
+            return 'string';
+
+        } elseif (strpos($type, 'integer') !== false ||
+            strpos($type, 'bigint') !== false ||
+            strpos($type, 'smallint') !== false) {
+
+            return 'integer';
+
+        } elseif (strpos($type, 'decimal') !== false ||
+            strpos($type, 'float') !== false) {
+
+            return 'float';
+
+        } elseif (strpos($type, 'boolean') !== false) {
+
+            return 'boolean';
+
+        } elseif (strpos($type, 'mixed') !== false) {
+
+            return 'mixed';
+
         }
+
+        return '';
     }
 
     /**

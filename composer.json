@@ -28,8 +28,5 @@
     "require-dev": {
         "mockery/mockery": "dev-master"
     },
-    "config": {
-        "vendor-dir": "src/vendor"
-    },
     "minimum-stability": "dev"
 }

@@ -44,23 +44,18 @@ interface DBInterface
     public function getModelTablePrefix();
 
     /**
-     * @param $table
-     *
      * @access public
      *
      * @return mixed
      */
-    public function getTableSchemaManager($table);
+    public function getTableSchemaManager();
 
     /**
-     * @param $schema
-     * @param $table
-     *
      * @access public
      *
      * @return mixed
      */
-    public function getTableColumns($schema, $table);
+    public function getTableColumns();
 
     /**
      * @access public
