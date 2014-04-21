@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
 use DatabaseHelpers\LaravelHelper;
 
 class DBHelper
@@ -14,58 +13,90 @@ class DBHelper
 
     /**
      * @param Model                 $model
-     * @param Database Connection   $dbConnection
+     * @param Database type         $type
      *
-     * if using $dbConnection, it expects an associative array with the database
-     * credentials needed for the type of database connection -
-     * default connection type is mysql
-     *
-     * $dbConnection example: [
-     *      'hostname' => 'somename',
-     *      'user' => 'someuser',
-     *      'password' => 'password',
-     *      'database' => 'db_name',
-     *      'type' => 'mysql'
-     * ]
-     *
-     * obviously if you use another type of database, you would have to
-     * possibly have different set of parameters, but will need to set the
-     * database type, and create the DatabaseHelper for it
+     * This $type is the type of database you want to connect to. This
+     * will use the /config/helperConfig database connection type, with
+     * the database credentials to connect to the database and attempt
+     * to get the table info.
      *
      * @access public
      */
-    public function __construct($model, $dbConnection = null)
+    public function __construct($model, $type = null)
     {
         if (class_exists($model)) {
 
             $model = new $model;
 
-            if ($model instanceof Eloquent) {
+            if ($model instanceof Illuminate\Database\Eloquent\Model) {
 
                 $this->modelInfo = new LaravelHelper($model);
 
-            } elseif ($dbConnection) {
+            } elseif ($type) {
 
-                $this->connect($model, $dbConnection);
+                $this->modelInfo = $this->klassConnect($model, $type);
 
             }
 
         }
 
-        $this->modelInfo = new LaravelHelper($model);
     }
 
-
-    private function connect($model, $dbConnection)
+    /**
+     * @param Model                 $model
+     * @param Database type         $type
+     *
+     * This $type is the type of database you want to connect to. This
+     * will use the /config/helperConfig database connection type, with
+     * the database credentials to connect to the database and attempt
+     * to get the table info.
+     *
+     * @access private
+     */
+    private function getKlass($model, $type)
     {
-        if (isset($dbConnection['type'])) {
+        if (class_exists('\DatabaseHelpers\\Databases\\'.$type)) {
 
-            if (class_exists('\DatabaseHelpers\\Databases\\'.$dbConnection['type'])) {
+            return '\DatabaseHelpers\\Databases\\'.$type;
 
-                $klass = '\DatabaseHelpers\\Databases\\'.$dbConnection['type'];
-                $this->modelInfo = new $klass($model, $dbConnection);
+        }
+
+        return null;
+
+    }
+
+    /**
+     * @param Model                 $model
+     * @param Database type         $type
+     *
+     * This $type is the type of database you want to connect to. This
+     * will use the /config/helperConfig database connection type, with
+     * the database credentials to connect to the database and attempt
+     * to get the table info.
+     *
+     * @access private
+     */
+    private function klassConnect($model, $type)
+    {
+
+        $klass = $this->getKlass($model, $type);
+
+        if (!is_null($klass)) {
+
+            $this->modelInfo = new $klass($model, $type);
+
+            if ($this->modelInfo->getErrors()) {
+
+                echo "There was a problem connecting to the database. \n\r".
+                    print_r($this->modelInfo->getErrors(), true);
+                die();
 
             }
+
+        } else {
+
+            echo "There was no database connection type for the type you requested.";
+            die();
 
         }
 

@@ -30,6 +30,11 @@ class MySql implements DBInterface
     /**
      * @access protected
      */
+    protected $errors = null;
+
+    /**
+     * @access protected
+     */
     protected $dbConnection;
 
     /**
@@ -44,38 +49,78 @@ class MySql implements DBInterface
 
     /**
      * @param Model                 $model
-     * @param Database Connection   $dbConnection
      *
      * @access public
      */
-    public function __construct($model, $dbConnection)
+    public function __construct($model, $type)
     {
-        $this->model = strtolower($model);
-        $this->dbConnection = $dbConnection;
-        $columns = $this->getTableColumns();
+        $this->model = $model;
+        $this->type = $type;
 
-        $this->filterTableColumns($this->model, $columns);
+        $this->dbConnect();
+
+        if (!$this->getErrors()) {
+
+            $this->getTableColumns();
+
+        }
+
     }
 
     /**
-     * @param $query
+     * @access private
      *
+     * @return mixed
+     */
+    private function dbConnect()
+    {
+
+        if (count(Config::get("helperConfig.database.$this->type")) > 0) {
+
+            $this->dbConnection = mysqli_connect(
+                Config::get("helperConfig.database.$this->type.host"),
+                Config::get("helperConfig.database.$this->type.user"),
+                Config::get("helperConfig.database.$this->type.password"),
+                Config::get("helperConfig.database.$this->type.shared_components")
+            );
+
+            if (mysqli_connect_errno()) {
+
+                $this->addError(mysqli_connect_error());
+
+            }
+
+        }
+
+    }
+
+    /**
      * @access public
      *
      * @return mixed
      */
-    public function dbQuery($query)
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param mixed $error
+     *
+     * @access private
+     *
+     * @return mixed
+     */
+    private function addError($error)
     {
 
-        mysql_connect(
-            $this->dbConnection['hostname'],
-            $this->dbConnection['user'],
-            $this->dbConnection['password']
-        );
+        if (!$this->errors) {
 
-        mysql_select_db($this->dbConnection['database']);
+            $this->errors = [];
 
-        return mysql_query($query);
+            $this->errors[] = $error;
+
+        }
 
     }
 
@@ -89,25 +134,19 @@ class MySql implements DBInterface
     public function getTableColumns()
     {
 
-        $result = $this->dbQuery("SHOW COLUMNS FROM sometable");
+        if (mysqli_num_rows(mysqli_query($this->dbConnection, "SHOW TABLES LIKE '$this->model'")) == 1) {
 
-        if (!$result) {
+            $results = $this->dbConnection->query("SHOW COLUMNS FROM '$this->model'");
 
-            echo 'Could not run query: ' . mysql_error();
+            if (mysqli_num_rows($results) > 0) {
 
-            exit;
-
-        }
-
-
-
-        if (mysql_num_rows($result) > 0) {
-
-            while ($row = mysql_fetch_assoc($result)) {
-
-                $this->addProperty($row['Field'], $row['Type'], true, true);
+                $this->filterTableColumns($results);
 
             }
+
+        } else {
+
+            $this->addError("There is no table found for this model.");
 
         }
 
@@ -201,27 +240,23 @@ class MySql implements DBInterface
     public function filterTableColumns($columns)
     {
 
-        if (mysql_num_rows($columns) > 0) {
+        while ($column = mysqli_fetch_assoc($columns)) {
 
-            while ($column = mysql_fetch_assoc($columns)) {
+            $name = $this->getColumnName($column);
 
-                $name = $this->getColumnName($column);
+            if ($this->isColumnDate($column)) {
 
-                if ($this->isColumnDate($column)) {
+                $type = '\Carbon\Carbon';
 
-                    $type = '\Carbon\Carbon';
+            } else {
 
-                } else {
-
-                    $type = $this->filterTableFieldType($this->getColumnName($column));
-
-                }
-
-                $this->addProperty($name, $type, true, true);
-
-                $this->addMethod(Str::camel("where_".$name), null, array('$value'));
+                $type = $this->filterTableFieldType($this->getColumnName($column));
 
             }
+
+            $this->addProperty($name, $type, true, true);
+
+            $this->addMethod(Str::camel("where_".$name), null, array('$value'));
 
         }
 
