@@ -12,17 +12,21 @@ class DBHelper
     protected $modelInfo;
 
     /**
-     * @param Model                 $model
-     * @param Database type         $type
+     * @var $config
+     * @static
+     */
+    protected $config;
+
+    /**
+     * @param Model                  $model
+     * @param Database configuration $config
      *
-     * This $type is the type of database you want to connect to. This
-     * will use the /config/helperConfig database connection type, with
-     * the database credentials to connect to the database and attempt
-     * to get the table info.
+     * This $config expects an object with your database
+     * type, host, user, password, database
      *
      * @access public
      */
-    public function __construct($model, $type = null)
+    public function __construct($model, $config = null)
     {
         if (class_exists($model)) {
 
@@ -32,9 +36,11 @@ class DBHelper
 
                 $this->modelInfo = new LaravelHelper($model);
 
-            } elseif ($type) {
+            } elseif ($config) {
 
-                $this->modelInfo = $this->klassConnect($model, $type);
+                $this->config = $config;
+
+                $this->modelInfo = $this->klassConnect($model);
 
             }
 
@@ -43,21 +49,13 @@ class DBHelper
     }
 
     /**
-     * @param Model                 $model
-     * @param Database type         $type
-     *
-     * This $type is the type of database you want to connect to. This
-     * will use the /config/helperConfig database connection type, with
-     * the database credentials to connect to the database and attempt
-     * to get the table info.
-     *
      * @access private
      */
-    private function getKlass($model, $type)
+    private function getKlass()
     {
-        if (class_exists('\DatabaseHelpers\\Databases\\'.$type)) {
+        if (class_exists('\DatabaseHelpers\\Databases\\'.$this->config->type)) {
 
-            return '\DatabaseHelpers\\Databases\\'.$type;
+            return '\DatabaseHelpers\\Databases\\'.$this->config->type;
 
         }
 
@@ -67,7 +65,6 @@ class DBHelper
 
     /**
      * @param Model                 $model
-     * @param Database type         $type
      *
      * This $type is the type of database you want to connect to. This
      * will use the /config/helperConfig database connection type, with
@@ -76,14 +73,14 @@ class DBHelper
      *
      * @access private
      */
-    private function klassConnect($model, $type)
+    private function klassConnect($model)
     {
 
-        $klass = $this->getKlass($model, $type);
+        $klass = $this->getKlass($model);
 
         if (!is_null($klass)) {
 
-            $this->modelInfo = new $klass($model, $type);
+            $this->modelInfo = new $klass($model, $this->config);
 
             if ($this->modelInfo->getErrors()) {
 

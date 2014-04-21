@@ -1,7 +1,6 @@
 <?php namespace DatabaseHelpers\Databases;
 
 use DB\DBInterface;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 /**
@@ -21,6 +20,11 @@ class MySql implements DBInterface
      * @access protected
      */
     protected $table;
+
+    /**
+     * @access protected
+     */
+    protected $config;
 
     /**
      * @access protected
@@ -52,10 +56,10 @@ class MySql implements DBInterface
      *
      * @access public
      */
-    public function __construct($model, $type)
+    public function __construct($model, $config)
     {
         $this->model = $model;
-        $this->type = $type;
+        $this->config = $config;
 
         $this->dbConnect();
 
@@ -75,13 +79,13 @@ class MySql implements DBInterface
     private function dbConnect()
     {
 
-        if (count(Config::get("helperConfig.database.$this->type")) > 0) {
+        if ($this->config) {
 
             $this->dbConnection = mysqli_connect(
-                Config::get("helperConfig.database.$this->type.host"),
-                Config::get("helperConfig.database.$this->type.user"),
-                Config::get("helperConfig.database.$this->type.password"),
-                Config::get("helperConfig.database.$this->type.shared_components")
+                $this->config->host,
+                $this->config->user,
+                $this->config->password,
+                $this->config->database
             );
 
             if (mysqli_connect_errno()) {
@@ -313,8 +317,7 @@ class MySql implements DBInterface
      */
     public function getModelClass()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
-        return '\Illuminate\Database\Query\Builder|\\'.get_class($this->model);
+        return null;
     }
 
     /**
