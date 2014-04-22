@@ -18,6 +18,8 @@ class HelperFactory
 
         } elseif($config) {
 
+            $dbType = null;
+
             try {
 
                 $dbType = self::getDatabaseType($config);
