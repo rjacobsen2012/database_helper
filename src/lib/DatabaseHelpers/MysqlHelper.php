@@ -1,14 +1,15 @@
-<?php namespace DatabaseHelpers\Databases;
+<?php namespace DatabaseHelpers;
 
 use DB\DBInterface;
 use Illuminate\Support\Str;
+use DatabaseHelpers\Databases\MysqliRepository;
 
 /**
  * Class DatabaseHelper
  *
  * @package DatabaseHelpers
  */
-class MySql implements DBInterface
+class MysqlHelper implements DBInterface
 {
 
     /**
@@ -56,73 +57,19 @@ class MySql implements DBInterface
      *
      * @access public
      */
-    public function __construct($model, $config)
+    public function __construct($model, $dbConnection)
     {
+
         $this->model = $model;
-        $this->config = $config;
+        $this->dbConnection = $dbConnection;
 
-        $this->dbConnect();
-
-        if (!$this->getErrors()) {
+        try {
 
             $this->getTableColumns();
 
-        }
+        } catch (Exception $e) {
 
-    }
-
-    /**
-     * @access private
-     *
-     * @return mixed
-     */
-    private function dbConnect()
-    {
-
-        if ($this->config) {
-
-            $this->dbConnection = mysqli_connect(
-                $this->config->host,
-                $this->config->user,
-                $this->config->password,
-                $this->config->database
-            );
-
-            if (mysqli_connect_errno()) {
-
-                $this->addError(mysqli_connect_error());
-
-            }
-
-        }
-
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * @param mixed $error
-     *
-     * @access private
-     *
-     * @return mixed
-     */
-    private function addError($error)
-    {
-
-        if (!$this->errors) {
-
-            $this->errors = [];
-
-            $this->errors[] = $error;
+            echo 'Caught exception: ', $e->getMessage(), "\n";
 
         }
 
@@ -138,19 +85,15 @@ class MySql implements DBInterface
     public function getTableColumns()
     {
 
-        if (mysqli_num_rows(mysqli_query($this->dbConnection, "SHOW TABLES LIKE '$this->model'")) == 1) {
+        $columnsFound = MysqliRepository::getTableColumns($this->model, $this->dbConnection);
 
-            $results = $this->dbConnection->query("SHOW COLUMNS FROM '$this->model'");
+        if ($columnsFound) {
 
-            if (mysqli_num_rows($results) > 0) {
-
-                $this->filterTableColumns($results);
-
-            }
+            $this->filterTableColumns($columnsFound);
 
         } else {
 
-            $this->addError("There is no table found for this model.");
+            throw new Exception("[{$this->model}] table was not found.");
 
         }
 
@@ -244,7 +187,7 @@ class MySql implements DBInterface
     public function filterTableColumns($columns)
     {
 
-        while ($column = mysqli_fetch_assoc($columns)) {
+        while ($column = $columns->fetch_assoc()) {
 
             $name = $this->getColumnName($column);
 
