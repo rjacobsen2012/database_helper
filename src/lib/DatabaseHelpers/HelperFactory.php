@@ -1,5 +1,7 @@
 <?php namespace DatabaseHelpers;
 
+use Exception;
+
 class HelperFactory
 {
 
