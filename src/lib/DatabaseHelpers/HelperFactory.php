@@ -7,7 +7,7 @@ class HelperFactory
 {
 
     public static $allowed_databases = [
-        'mysqli'
+        'mysql'
     ];
 
     public static function make($model, $config)
@@ -34,9 +34,9 @@ class HelperFactory
 
             switch ($dbType) {
 
-                case "mysqli":
+                case "mysql":
 
-                    $dbConnection = MysqliRepository::connect($dbType, $config);
+                    $dbConnection = MysqliRepository::connect("mysqli", $config);
                     return new MysqlHelper($model, $dbConnection);
 
                     break;
