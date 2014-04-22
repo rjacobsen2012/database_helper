@@ -187,13 +187,13 @@ class MysqlHelper implements DBInterface
 
             } else {
 
-                $type = $this->filterTableFieldType($this->getColumnName($column));
+                $type = $this->filterTableFieldType($this->getColumnType($column));
 
             }
 
-            $this->addProperty($name, $type, true, true);
+            $this->addProperty($name, $type, $this->isRequired($column), true, true);
 
-            $this->addMethod(Str::camel("where_".$name), null, array('$value'));
+            $this->addMethod(Str::camel("where_".$name), $this->getColumnType($column), array('$value'));
 
         }
 
@@ -240,7 +240,29 @@ class MysqlHelper implements DBInterface
      */
     public function getColumnType($column)
     {
-        return $this->filterTableFieldType($this->getColumnName($column));
+
+        return $column['Type'];
+
+    }
+
+    /**
+     * @param $column
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function isRequired($column)
+    {
+
+        if ($column['Null'] == 'NO') {
+
+            return true;
+
+        }
+
+        return false;
+
     }
 
     /**
@@ -263,7 +285,8 @@ class MysqlHelper implements DBInterface
     public function filterTableFieldType($type)
     {
 
-        if (strpos($type, 'string') !== false ||
+        if (strpos($type, 'varchar') !== false ||
+            strpos($type, 'string') !== false ||
             strpos($type, 'text') !== false ||
             strpos($type, 'date') !== false ||
             strpos($type, 'time') !== false ||
@@ -273,7 +296,8 @@ class MysqlHelper implements DBInterface
 
             return 'string';
 
-        } elseif (strpos($type, 'integer') !== false ||
+        } elseif (strpos($type, 'int') !== false ||
+            strpos($type, 'integer') !== false ||
             strpos($type, 'bigint') !== false ||
             strpos($type, 'smallint') !== false) {
 
@@ -307,14 +331,15 @@ class MysqlHelper implements DBInterface
      *
      * @return mixed
      */
-    public function addProperty($name, $type = null, $read = null, $write = null)
+    public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
     {
         if (!isset($this->properties[$name])) {
 
             $this->properties[$name] = [
                 'type' => 'mixed',
                 'read' => false,
-                'write' => false
+                'write' => false,
+                'required' => $required
             ];
 
         }

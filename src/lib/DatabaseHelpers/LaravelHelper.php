@@ -171,7 +171,7 @@ class LaravelHelper implements DBInterface
 
                 }
 
-                $this->addProperty($name, $type, true, true);
+                $this->addProperty($name, $type, false, true, true);
 
                 $this->addMethod(Str::camel("where_".$name), $this->getModelClass($this->model), array('$value'));
 
@@ -262,14 +262,15 @@ class LaravelHelper implements DBInterface
      *
      * @return mixed
      */
-    public function addProperty($name, $type = null, $read = null, $write = null)
+    public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
     {
         if (!isset($this->properties[$name])) {
 
             $this->properties[$name] = [
                 'type' => 'mixed',
                 'read' => false,
-                'write' => false
+                'write' => false,
+                'required' => $required
             ];
 
         }

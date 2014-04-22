@@ -39,7 +39,7 @@ class MysqliRepository
     public function getColumns($model)
     {
 
-        $result = $this->dbConnection->query("SHOW COLUMNS FROM '".$model."'");
+        $result = $this->dbConnection->query("SHOW COLUMNS FROM ".$model);
 
         if ($result->num_rows > 0) {
 
