@@ -63,16 +63,7 @@ class MysqlHelper implements DBInterface
 
         $this->model = $model;
         $this->dbConnection = $dbConnection;
-
-        try {
-
-            $this->getTableColumns();
-
-        } catch (Exception $e) {
-
-            echo 'Caught exception: ', $e->getMessage(), "\n";
-
-        }
+        $this->getTableColumns();
 
     }
 

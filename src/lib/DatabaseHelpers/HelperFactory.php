@@ -1,5 +1,6 @@
 <?php namespace DatabaseHelpers;
 
+use DatabaseHelpers\Databases\MysqliRepository;
 use Illuminate\Exception;
 
 class HelperFactory
@@ -16,34 +17,27 @@ class HelperFactory
 
             return new \DatabaseHelpers\LaravelHelper($model);
 
-        } elseif($config) {
+        } elseif ($config) {
 
-            $dbType = null;
+            return self::loadHelper($model, $config);
 
-            try {
+        }
 
-                $dbType = self::getDatabaseType($config);
+    }
 
-                $dbConnection = new $dbType(
-                    self::getHost($config),
-                    self::getUsername($config),
-                    self::getPassword($config),
-                    self::getDatabase($config),
-                    self::getPort($config),
-                    self::getSocket($config)
-                );
+    public static function loadHelper($model, $config)
+    {
 
-            } catch (Exception $e) {
+        $dbType = ConfigReader::getType($config);
 
-                echo 'Caught exception: ', $e->getMessage(), "\n";
-
-            }
+        if (self::isSupportedSource($dbType)) {
 
             switch ($dbType) {
 
-                case "mysql":
+                case "mysqli":
 
-                    return new \DatabaseHelpers\MysqlHelper($model, $dbConnection);
+                    $dbConnection = MysqliRepository::connect($dbType, $config);
+                    return new MysqlHelper($model, $dbConnection);
 
                     break;
 
@@ -53,16 +47,18 @@ class HelperFactory
 
     }
 
-    public static function checkIfValid($dbType)
+    public static function isSupportedSource($dbType)
     {
 
         if (!in_array($dbType, self::$allowed_databases)) {
 
-            throw new Exception("[{$dbType}] is not a valid database option.");
+            throw new Exception("Config type parameter [{$dbType}] is not valid.");
+
+        } else {
+
+            return true;
 
         }
-
-        return true;
 
     }
 
@@ -82,117 +78,6 @@ class HelperFactory
         }
 
         return false;
-
-    }
-
-    public static function isMysqli($type)
-    {
-
-        if ($type == "mysqli") {
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    public static function getDatabaseType($config)
-    {
-
-        return self::getType($config);
-
-    }
-
-    public static function getType($config)
-    {
-
-        if (isset($config->type) && self::checkIfValid($config->type)) {
-
-            return $config->type;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getHost($config)
-    {
-
-        if (isset($config->host)) {
-
-            return $config->host;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getUsername($config)
-    {
-
-        if (isset($config->user)) {
-
-            return $config->user;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getPassword($config)
-    {
-
-        if (isset($config->password)) {
-
-            return $config->password;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getDatabase($config)
-    {
-
-        if (isset($config->database)) {
-
-            return $config->database;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getPort($config)
-    {
-
-        if (isset($config->port)) {
-
-            return $config->port;
-
-        }
-
-        return null;
-
-    }
-
-    public static function getSocket($config)
-    {
-
-        if (isset($config->socket)) {
-
-            return $config->socket;
-
-        }
-
-        return null;
 
     }
 
