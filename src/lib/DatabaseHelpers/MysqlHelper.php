@@ -85,7 +85,7 @@ class MysqlHelper implements DBInterface
 
         } else {
 
-            throw new Exception("[{$this->model}] table was not found.");
+            throw new ExceptionHandler("[{$this->model}] table was not found.");
 
         }
 

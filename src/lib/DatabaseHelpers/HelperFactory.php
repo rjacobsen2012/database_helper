@@ -52,7 +52,7 @@ class HelperFactory
 
         if (!in_array($dbType, self::$allowed_databases)) {
 
-            throw new Exception("Config type parameter [{$dbType}] is not valid.");
+            throw new ExceptionHandler("Config type parameter [{$dbType}] is not valid.");
 
         } else {
 
