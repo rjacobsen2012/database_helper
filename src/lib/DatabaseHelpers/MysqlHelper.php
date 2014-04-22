@@ -1,5 +1,6 @@
 <?php namespace DatabaseHelpers;
 
+use Illuminate\Exception;
 use DB\DBInterface;
 use Illuminate\Support\Str;
 use DatabaseHelpers\Databases\MysqliRepository;

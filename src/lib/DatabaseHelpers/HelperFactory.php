@@ -1,6 +1,6 @@
 <?php namespace DatabaseHelpers;
 
-use Exception;
+use Illuminate\Exception;
 
 class HelperFactory
 {
