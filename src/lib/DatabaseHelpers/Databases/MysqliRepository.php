@@ -8,7 +8,17 @@ class MysqliRepository
 
         if (self::checkForTable($model, $dbConnection)) {
 
-            $result = $dbConnection->query("SHOW COLUMNS FROM `".$model."`");
+            $result = $dbConnection->query("SHOW COLUMNS FROM '".$model."'");
+
+            if ($result->num_rows > 0) {
+
+                return $result;
+
+            }
+
+        } elseif (self::checkForTable(strtolower($model), $dbConnection)) {
+
+            $result = $dbConnection->query("SHOW COLUMNS FROM '".$model."'");
 
             if ($result->num_rows > 0) {
 
@@ -25,7 +35,7 @@ class MysqliRepository
     public static function checkForTable($model, $dbConnection)
     {
 
-        $result = $dbConnection->query("SHOW TABLES LIKE `".$model."`");
+        $result = $dbConnection->query("SHOW TABLES LIKE '".$model."'");
 
         if ($result->num_rows == 1) {
 
