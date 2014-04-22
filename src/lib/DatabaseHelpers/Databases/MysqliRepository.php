@@ -5,10 +5,11 @@ use DatabaseHelpers\ConfigReader;
 class MysqliRepository
 {
 
-    public static function connect($dbType, $config)
-    {
+    public $dbConnection = null;
 
-        return new $dbType(
+    public function __construct($config)
+    {
+        $this->dbConnection = new \mysqli(
             ConfigReader::getHost($config),
             ConfigReader::getUser($config),
             ConfigReader::getPassword($config),
@@ -16,31 +17,18 @@ class MysqliRepository
             ConfigReader::getPort($config),
             ConfigReader::getSocket($config)
         );
-
     }
 
-    public static function getTableColumns($model, $dbConnection)
+    public function getTableColumns($model)
     {
 
-        if (self::checkForTable($model, $dbConnection)) {
+        if ($this->checkForTable($model)) {
 
-            $result = $dbConnection->query("SHOW COLUMNS FROM '".$model."'");
+            return $this->getColumns($model);
 
-            if ($result->num_rows > 0) {
+        } elseif (self::checkForTable(strtolower($model))) {
 
-                return $result;
-
-            }
-
-        } elseif (self::checkForTable(strtolower($model), $dbConnection)) {
-
-            $result = $dbConnection->query("SHOW COLUMNS FROM '".$model."'");
-
-            if ($result->num_rows > 0) {
-
-                return $result;
-
-            }
+            return $this->getColumns(strtolower($model));
 
         }
 
@@ -48,10 +36,25 @@ class MysqliRepository
 
     }
 
-    public static function checkForTable($model, $dbConnection)
+    public function getColumns($model)
     {
 
-        $result = $dbConnection->query("SHOW TABLES LIKE '".$model."'");
+        $result = $this->dbConnection->query("SHOW COLUMNS FROM '".$model."'");
+
+        if ($result->num_rows > 0) {
+
+            return $result;
+
+        }
+
+        return null;
+
+    }
+
+    public function checkForTable($model)
+    {
+
+        $result = $this->dbConnection->query("SHOW TABLES LIKE '".$model."'");
 
         if ($result->num_rows == 1) {
 

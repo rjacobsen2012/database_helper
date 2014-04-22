@@ -98,7 +98,6 @@ class LaravelHelper implements DBInterface
     public function getModelTable()
     {
 
-        /** @param \Illuminate\Database\Eloquent\Model $model */
         return $this->model->getTable();
 
     }
@@ -110,7 +109,6 @@ class LaravelHelper implements DBInterface
      */
     public function getModelTablePrefix()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
         return $this->model->getConnection()->getTablePrefix;
     }
 
@@ -121,7 +119,6 @@ class LaravelHelper implements DBInterface
      */
     public function getTableSchemaManager()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
         return $this->model->getConnection()->getDoctrineSchemaManager($this->table);
     }
 
@@ -143,7 +140,6 @@ class LaravelHelper implements DBInterface
      */
     public function getModelDates()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
         return $this->model->getDates();
     }
 
@@ -216,7 +212,6 @@ class LaravelHelper implements DBInterface
      */
     public function getModelClass()
     {
-        /** @param \Illuminate\Database\Eloquent\Model $model */
         return '\Illuminate\Database\Query\Builder|\\'.get_class($this->model);
     }
 

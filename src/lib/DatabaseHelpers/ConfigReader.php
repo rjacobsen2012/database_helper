@@ -1,7 +1,5 @@
 <?php namespace DatabaseHelpers;
 
-use Illuminate\Exception;
-
 class ConfigReader
 {
 
@@ -14,7 +12,7 @@ class ConfigReader
 
         } else {
 
-            throw new ExceptionHandler("Config type parameter is not set.");
+            throw new \Exception("Config type parameter is not set.");
 
         }
 
@@ -29,7 +27,7 @@ class ConfigReader
 
         } else {
 
-            throw new ExceptionHandler("Config host parameter is not set.");
+            throw new \Exception("Config host parameter is not set.");
 
         }
 
@@ -44,7 +42,7 @@ class ConfigReader
 
         } else {
 
-            throw new ExceptionHandler("Config user parameter is not set.");
+            throw new \Exception("Config user parameter is not set.");
 
         }
 
@@ -59,7 +57,7 @@ class ConfigReader
 
         } else {
 
-            throw new ExceptionHandler("Config password parameter is not set.");
+            throw new \Exception("Config password parameter is not set.");
 
         }
 
@@ -74,7 +72,7 @@ class ConfigReader
 
         } else {
 
-            throw new ExceptionHandler("Config database parameter is not set.");
+            throw new \Exception("Config database parameter is not set.");
 
         }
 

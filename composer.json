@@ -16,7 +16,8 @@
         "classmap": ["src/lib"]
     },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "illuminate/support": "4.1.*@dev"
     },
     "require-dev": {
         "mockery/mockery": "dev-master"

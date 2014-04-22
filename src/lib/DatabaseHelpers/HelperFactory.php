@@ -1,7 +1,6 @@
 <?php namespace DatabaseHelpers;
 
 use DatabaseHelpers\Databases\MysqliRepository;
-use Illuminate\Exception;
 
 class HelperFactory
 {
@@ -36,12 +35,15 @@ class HelperFactory
 
                 case "mysql":
 
-                    $dbConnection = MysqliRepository::connect("mysqli", $config);
-                    return new MysqlHelper($model, $dbConnection);
+                    return new MysqlHelper($model, new MysqliRepository($config));
 
                     break;
 
             }
+
+        } else {
+
+            throw new \Exception("Config type parameter [{$dbType}] is not valid.");
 
         }
 
@@ -50,15 +52,13 @@ class HelperFactory
     public static function isSupportedSource($dbType)
     {
 
-        if (!in_array($dbType, self::$allowed_databases)) {
-
-            throw new ExceptionHandler("Config type parameter [{$dbType}] is not valid.");
-
-        } else {
+        if (in_array($dbType, self::$allowed_databases)) {
 
             return true;
 
         }
+
+        return false;
 
     }
 

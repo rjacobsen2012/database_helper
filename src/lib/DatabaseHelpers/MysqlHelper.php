@@ -1,9 +1,7 @@
 <?php namespace DatabaseHelpers;
 
-use Illuminate\Exception;
 use DB\DBInterface;
 use Illuminate\Support\Str;
-use DatabaseHelpers\Databases\MysqliRepository;
 
 /**
  * Class DatabaseHelper
@@ -77,7 +75,7 @@ class MysqlHelper implements DBInterface
     public function getTableColumns()
     {
 
-        $columnsFound = MysqliRepository::getTableColumns($this->model, $this->dbConnection);
+        $columnsFound = $this->dbConnection->getTableColumns($this->model);
 
         if ($columnsFound) {
 
@@ -85,7 +83,7 @@ class MysqlHelper implements DBInterface
 
         } else {
 
-            throw new ExceptionHandler("[{$this->model}] table was not found.");
+            throw new \Exception("[{$this->model}] table was not found.");
 
         }
 
