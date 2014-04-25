@@ -13,14 +13,19 @@
         }
     ],
     "autoload": {
-        "classmap": ["src/lib"]
+        "classmap": [
+            "src/lib"
+        ]
     },
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.1.*@dev"
+        "illuminate/support": "4.1.*@dev",
+        "doctrine/inflector": "1.0.*@dev"
     },
     "require-dev": {
-        "mockery/mockery": "dev-master"
+        "mockery/mockery": "dev-master",
+        "phpunit/phpunit": "4.2.*@dev",
+        "illuminate/database": "4.1.*@dev"
     },
     "minimum-stability": "dev"
 }
