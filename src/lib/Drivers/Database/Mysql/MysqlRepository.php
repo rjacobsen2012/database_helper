@@ -37,12 +37,12 @@ class MysqlRepository implements RepositoryInterface
     /**
      * @access protected
      */
-    protected $properties = [];
+    protected $columns;
 
     /**
      * @access protected
      */
-    protected $methods = [];
+    protected $properties = [];
 
     protected $dbConnection = null;
 
@@ -110,7 +110,8 @@ class MysqlRepository implements RepositoryInterface
 
         if ($result->num_rows > 0) {
 
-            return $result;
+            $this->columns = $result;
+            return $this->columns;
 
         }
 
@@ -138,8 +139,7 @@ class MysqlRepository implements RepositoryInterface
     {
 
         return [
-            'properties' => $this->properties,
-            'methods' => $this->methods
+            'properties' => $this->properties
         ];
 
     }
@@ -149,19 +149,9 @@ class MysqlRepository implements RepositoryInterface
         return $this->properties;
     }
 
-    public function getTableMethods()
-    {
-        return $this->methods;
-    }
-
     public function getModelTable()
     {
         return $this->table;
-    }
-
-    public function getModelTablePrefix()
-    {
-        return null;
     }
 
     public function getTableSchemaManager()
@@ -174,10 +164,17 @@ class MysqlRepository implements RepositoryInterface
         return null;
     }
 
-    public function filterTableColumns($columns)
+    public function fetchRow()
     {
 
-        while ($column = $columns->fetch_assoc()) {
+        return $this->columns->fetch_assoc();
+
+    }
+
+    public function filterTableColumns()
+    {
+
+        while ($column = $this->fetchRow()) {
 
             $name = $this->getColumnName($column);
 
@@ -192,8 +189,6 @@ class MysqlRepository implements RepositoryInterface
             }
 
             $this->addProperty($name, $type, $this->isRequired($column), true, true);
-
-            $this->addMethod(StringHelper::toCamel("where_".$name), $this->getColumnType($column), array('$value'));
 
         }
 
@@ -233,11 +228,6 @@ class MysqlRepository implements RepositoryInterface
 
         return false;
 
-    }
-
-    public function getModelClass()
-    {
-        return null;
     }
 
     public function filterTableFieldType($type)
@@ -286,43 +276,141 @@ class MysqlRepository implements RepositoryInterface
     public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
     {
 
-        if (!isset($this->properties[$name])) {
-
-            $this->properties[$name] = [
-                'type' => 'mixed',
-                'read' => false,
-                'write' => false,
-                'required' => $required
-            ];
-
-        }
-
-        if ($type !== null) {
-            $this->properties[$name]['type'] = $type;
-        }
-
-        if ($read !== null) {
-            $this->properties[$name]['read'] = $read;
-        }
-
-        if ($write !== null) {
-            $this->properties[$name]['write'] = $write;
-        }
+        $this->setProperty($name);
+        $this->setPropertyType($name, $type);
+        $this->setPropertyRead($name, $read);
+        $this->setPropertyWrite($name, $write);
+        $this->setPropertyRequired($name, $required);
 
     }
 
-    public function addMethod($name, $type = '', $arguments = [])
+    public function setProperty($name)
     {
 
-        if (!isset($this->methods[$name])) {
+        if (!isset($this->properties[$name])) {
 
-            $this->methods[$name] = [
-                'type' => $type,
-                'arguments' => $arguments
-            ];
+            $this->properties[$name] = [];
 
         }
 
     }
+
+    public function getProperty($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyType($name, $type = 'mixed')
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['type'] = $type;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyType($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['type'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyRead($name, $read)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['read'] = $read;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyRead($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['read'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyWrite($name, $write)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['write'] = $write;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyWrite($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['write'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyRequired($name, $required)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['required'] = $required;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyRequired($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['required'];
+
+        }
+
+        return null;
+
+    }
+
 }
 

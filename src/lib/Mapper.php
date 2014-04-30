@@ -19,13 +19,18 @@ class Mapper
      * @param null $port
      * @param null $socket
      */
-    public function setConfig($type, $host, $user, $password, $database, $port = null, $socket = null)
+    public function setDbConfig($type, $host, $user, $password, $database, $port = null, $socket = null)
     {
 
         $config = new ConfigHelper;
         $config->setConfig($type, $host, $user, $password, $database, $port, $socket);
         $this->dbconfig = $config;
 
+    }
+
+    public function getDbConfig()
+    {
+        return $this->dbconfig->getConfig();
     }
 
     public function getFields($name)
@@ -36,16 +41,6 @@ class Mapper
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
         return $mapper->getTableProperties();
-
-    }
-
-    public function getMethods($name)
-    {
-
-        $mapperFactory = new MapperFactory($name, $this->dbconfig);
-        /** @var \Contracts\ServicesInterface $mapper */
-        $mapper = $mapperFactory->build();
-        return $mapper->getTableMethods();
 
     }
 

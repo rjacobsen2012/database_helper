@@ -26,23 +26,17 @@ class DatabaseService implements ServicesInterface
     protected $repository;
 
     /**
-     * @var \Contracts\HelperInterface $helper
-     */
-    protected $helper;
-
-    /**
      * @param string                 $model
      * @param \Contracts\RepositoryInterface     $repository
      * @param \Contracts\HelperInterface              $helper
      *
      * @access public
      */
-    public function __construct($model, RepositoryInterface $repository, HelperInterface $helper)
+    public function __construct($model, RepositoryInterface $repository)
     {
 
         $this->model = $model;
         $this->repository = $repository;
-        $this->helper = $helper;
 
     }
 
@@ -54,7 +48,7 @@ class DatabaseService implements ServicesInterface
     public function getTableColumns()
     {
 
-        $this->repository->getTableColumns($this->model);
+        return $this->repository->getTableColumns($this->model);
 
     }
 
@@ -69,7 +63,6 @@ class DatabaseService implements ServicesInterface
         return $this->repository->getModelTableInfo();
     }
 
-
     /**
      * @access public
      *
@@ -80,17 +73,6 @@ class DatabaseService implements ServicesInterface
         return $this->repository->getTableProperties();
     }
 
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getTableMethods()
-    {
-        return $this->repository->getTableMethods();
-    }
-
     /**
      * @access public
      *
@@ -99,16 +81,6 @@ class DatabaseService implements ServicesInterface
     public function getModelTable()
     {
         return $this->repository->getModelTable();
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelTablePrefix()
-    {
-        return $this->repository->getModelTablePrefix();
     }
 
     /**
@@ -138,9 +110,9 @@ class DatabaseService implements ServicesInterface
      *
      * @return mixed
      */
-    public function filterTableColumns($columns)
+    public function filterTableColumns()
     {
-        return $this->repository->filterTableColumns($columns);
+        return $this->repository->filterTableColumns();
     }
 
     /**
@@ -165,16 +137,6 @@ class DatabaseService implements ServicesInterface
     public function getColumnType($column)
     {
         return $this->repository->getColumnType($column);
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelClass()
-    {
-        return $this->repository->getModelClass();
     }
 
     /**
@@ -204,17 +166,74 @@ class DatabaseService implements ServicesInterface
         return $this->repository->addProperty($name, $type, $read, $write);
     }
 
-    /**
-     * @param        $name
-     * @param string $type
-     * @param array  $arguments
-     *
-     * @access public
-     *
-     * @return mixed
-     */
-    public function addMethod($name, $type = '', $arguments = [])
+    public function setProperty($name)
     {
-        return $this->repository->addMethod($name, $type, $arguments);
+
+        return $this->repository->setProperty($name);
+
     }
+
+    public function getProperty($name)
+    {
+
+        return $this->repository->getProperty($name);
+
+    }
+
+    public function setPropertyType($name, $type = 'mixed')
+    {
+
+        return $this->repository->setPropertyType($name, $type);
+
+    }
+
+    public function getPropertyType($name)
+    {
+
+        return $this->repository->getPropertyType($name);
+
+    }
+
+    public function setPropertyRead($name, $read)
+    {
+
+        return $this->repository->setPropertyRead($name, $read);
+
+    }
+
+    public function getPropertyRead($name)
+    {
+
+        return $this->repository->getPropertyRead($name);
+
+    }
+
+    public function setPropertyWrite($name, $write)
+    {
+
+        return $this->repository->setPropertyWrite($name, $write);
+
+    }
+
+    public function getPropertyWrite($name)
+    {
+
+        return $this->repository->getPropertyWrite($name);
+
+    }
+
+    public function setPropertyRequired($name, $required)
+    {
+
+        return $this->repository->setPropertyRequired($name, $required);
+
+    }
+
+    public function getPropertyRequired($name)
+    {
+
+        return $this->repository->getPropertyRequired($name);
+
+    }
+
 }

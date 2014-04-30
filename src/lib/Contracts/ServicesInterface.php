@@ -27,21 +27,7 @@ interface ServicesInterface
      *
      * @return mixed
      */
-    public function getTableMethods();
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
     public function getModelTable();
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelTablePrefix();
 
     /**
      * @access public
@@ -71,7 +57,7 @@ interface ServicesInterface
      *
      * @return mixed
      */
-    public function filterTableColumns($columns);
+    public function filterTableColumns();
 
     /**
      * @param $column
@@ -90,13 +76,6 @@ interface ServicesInterface
      * @return mixed
      */
     public function getColumnType($column);
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelClass();
 
     /**
      * @param $type
@@ -119,16 +98,25 @@ interface ServicesInterface
      */
     public function addProperty($name, $type = null, $read = null, $write = null);
 
-    /**
-     * @param      $name
-     * @param string $type
-     * @param array $arguments
-     *
-     * @access public
-     *
-     * @return mixed
-     */
-    public function addMethod($name, $type = '', $arguments = []);
+    public function setProperty($name);
+
+    public function getProperty($name);
+
+    public function setPropertyType($name, $type = 'mixed');
+
+    public function getPropertyType($name);
+
+    public function setPropertyRead($name, $read);
+
+    public function getPropertyRead($name);
+
+    public function setPropertyWrite($name, $write);
+
+    public function getPropertyWrite($name);
+
+    public function setPropertyRequired($name, $required);
+
+    public function getPropertyRequired($name);
 
 }
 

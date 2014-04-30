@@ -18,17 +18,13 @@ interface RepositoryInterface
 
     public function getTableProperties();
 
-    public function getTableMethods();
-
     public function getModelTable();
-
-    public function getModelTablePrefix();
 
     public function getTableSchemaManager();
 
     public function getModelDates();
 
-    public function filterTableColumns($columns);
+    public function filterTableColumns();
 
     public function getColumnName($column);
 
@@ -38,12 +34,28 @@ interface RepositoryInterface
 
     public function isRequired($column);
 
-    public function getModelClass();
-
     public function filterTableFieldType($type);
 
     public function addProperty($name, $type = null, $required = false, $read = null, $write = null);
 
-    public function addMethod($name, $type = '', $arguments = []);
+    public function setProperty($name);
+
+    public function getProperty($name);
+
+    public function setPropertyType($name, $type = 'mixed');
+
+    public function getPropertyType($name);
+
+    public function setPropertyRead($name, $read);
+
+    public function getPropertyRead($name);
+
+    public function setPropertyWrite($name, $write);
+
+    public function getPropertyWrite($name);
+
+    public function setPropertyRequired($name, $required);
+
+    public function getPropertyRequired($name);
 
 }

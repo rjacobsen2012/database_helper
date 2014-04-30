@@ -18,10 +18,13 @@
     <filter>
         <blacklist>
             <directory>./vendor</directory>
+            <directory>./src/lib/Tests</directory>
+            <directory>./src/lib/Contracts</directory>
         </blacklist>
         <whitelist>
             <directory>./src/lib</directory>
+            <exclude>./src/lib/Tests</exclude>
+            <exclude>./src/lib/Contracts</exclude>
         </whitelist>
     </filter>
-
 </phpunit>

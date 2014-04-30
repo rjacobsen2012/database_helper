@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Contracts\ServicesInterface;
-use Helpers\StringHelper;
 
 /**
  * Class LaravelService
@@ -37,12 +36,12 @@ class LaravelService implements ServicesInterface
     /**
      * @access protected
      */
-    protected $properties = [];
+    protected $columns = null;
 
     /**
      * @access protected
      */
-    protected $methods = [];
+    protected $properties = [];
 
     /**
      * @param \Illuminate\Database\Eloquent\Model $model
@@ -60,10 +59,52 @@ class LaravelService implements ServicesInterface
     public function setDefaults()
     {
 
+        $this->setTable();
+        $this->setSchema();
+        $this->setColumns();
+        $this->filterTableColumns($this->model, $this->columns);
+
+    }
+
+    public function setTable()
+    {
+
         $this->table = $this->getModelTable();
+
+    }
+
+    public function getTable()
+    {
+
+        return $this->table;
+
+    }
+
+    public function setSchema()
+    {
+
         $this->schema = $this->getTableSchemaManager();
-        $columns = $this->getTableColumns();
-        $this->filterTableColumns($this->model, $columns);
+
+    }
+
+    public function getSchema()
+    {
+
+        return $this->schema;
+
+    }
+
+    public function setColumns()
+    {
+
+        $this->columns = $this->getTableColumns();
+
+    }
+
+    public function getColumns()
+    {
+
+        return $this->columns;
 
     }
 
@@ -80,19 +121,6 @@ class LaravelService implements ServicesInterface
 
     }
 
-    public function getMethods()
-    {
-
-        if (!$this->table) {
-
-            $this->setDefaults();
-
-        }
-
-        return $this->methods;
-
-    }
-
     /**
      * @access public
      *
@@ -101,8 +129,7 @@ class LaravelService implements ServicesInterface
     public function getModelTableInfo()
     {
         return [
-            'properties' => $this->getProperties(),
-            'methods' => $this->getMethods()
+            'properties' => $this->getProperties()
         ];
     }
 
@@ -117,17 +144,6 @@ class LaravelService implements ServicesInterface
         return $this->getProperties();
     }
 
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getTableMethods()
-    {
-        return $this->getMethods();
-    }
-
     /**
      * @access private
      */
@@ -136,16 +152,6 @@ class LaravelService implements ServicesInterface
 
         return $this->model->getTable();
 
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelTablePrefix()
-    {
-        return $this->model->getConnection()->getTablePrefix;
     }
 
     /**
@@ -186,16 +192,14 @@ class LaravelService implements ServicesInterface
      *
      * @return mixed
      */
-    public function filterTableColumns($columns)
+    public function filterTableColumns()
     {
 
-        if ($columns) {
+        if ($this->columns) {
 
             $modelDates = $this->getModelDates($this->model);
 
-            foreach ($columns as $column) {
-
-                $name = $this->getColumnName($column);
+            foreach ($this->columns as $name => $column) {
 
                 if (in_array($name, $modelDates)) {
 
@@ -203,17 +207,13 @@ class LaravelService implements ServicesInterface
 
                 } else {
 
-                    $type = $this->filterTableFieldType($this->getColumnName($column));
+                    $name = $this->getColumnName($column);
+
+                    $type = $this->filterTableFieldType($this->getColumnType($column));
 
                 }
 
                 $this->addProperty($name, $type, false, true, true);
-
-                $this->addMethod(
-                    StringHelper::toCamel("where_".$name),
-                    $this->getModelClass($this->model),
-                    array('$value')
-                );
 
             }
 
@@ -242,17 +242,7 @@ class LaravelService implements ServicesInterface
      */
     public function getColumnType($column)
     {
-        return $this->filterTableFieldType($this->getColumnName($column));
-    }
-
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getModelClass()
-    {
-        return '\Illuminate\Database\Query\Builder|\\'.get_class($this->model);
+        return $column->getType()->getName();
     }
 
     /**
@@ -315,50 +305,143 @@ class LaravelService implements ServicesInterface
      *
      * @return mixed
      */
-    public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
+    public function addProperty($name, $type = null, $required = false, $read = false, $write = false)
     {
+
+        $this->setProperty($name);
+        $this->setPropertyType($name, $type);
+        $this->setPropertyRead($name, $read);
+        $this->setPropertyWrite($name, $write);
+        $this->setPropertyRequired($name, $required);
+
+    }
+
+    public function setProperty($name)
+    {
+
         if (!isset($this->properties[$name])) {
 
-            $this->properties[$name] = [
-                'type' => 'mixed',
-                'read' => false,
-                'write' => false,
-                'required' => $required
-            ];
+            $this->properties[$name] = [];
 
         }
 
-        if ($type !== null) {
-            $this->properties[$name]['type'] = $type;
-        }
-
-        if ($read !== null) {
-            $this->properties[$name]['read'] = $read;
-        }
-
-        if ($write !== null) {
-            $this->properties[$name]['write'] = $write;
-        }
     }
 
-    /**
-     * @param        $name
-     * @param string $type
-     * @param array  $arguments
-     *
-     * @access public
-     *
-     * @return mixed
-     */
-    public function addMethod($name, $type = '', $arguments = [])
+    public function getProperty($name)
     {
-        if (!isset($this->methods[$name])) {
 
-            $this->methods[$name] = [
-                'type' => $type,
-                'arguments' => $arguments
-            ];
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name];
 
         }
+
+        return null;
+
     }
+
+    public function setPropertyType($name, $type = 'mixed')
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['type'] = $type;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyType($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['type'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyRead($name, $read)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['read'] = $read;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyRead($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['read'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyWrite($name, $write)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['write'] = $write;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyWrite($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['write'];
+
+        }
+
+        return null;
+
+    }
+
+    public function setPropertyRequired($name, $required)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['required'] = $required;
+
+        }
+
+        return null;
+
+    }
+
+    public function getPropertyRequired($name)
+    {
+
+        if (isset($this->properties[$name])) {
+
+            return $this->properties[$name]['required'];
+
+        }
+
+        return null;
+
+    }
+
 }

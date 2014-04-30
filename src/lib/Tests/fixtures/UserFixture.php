@@ -6,5 +6,13 @@ class UserFixture extends Model
 {
 
 
+    public function getColumnsNames()
+    {
+
+        $connection = DB::connection();
+
+
+    }
+
 
 }

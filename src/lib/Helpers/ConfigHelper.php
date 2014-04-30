@@ -30,6 +30,21 @@ class ConfigHelper
 
     }
 
+    public function getConfig()
+    {
+
+        return [
+            'type'      => $this->getType(),
+            'host'      => $this->getHost(),
+            'user'      => $this->getUser(),
+            'password'  => $this->getPassword(),
+            'database'  => $this->getDatabase(),
+            'port'      => $this->getPort(),
+            'socket'    => $this->getSocket()
+        ];
+
+    }
+
     public function setType($type)
     {
 
