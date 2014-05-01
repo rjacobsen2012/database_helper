@@ -1,7 +1,7 @@
 <?php namespace Tests\services;
 
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Drivers\Laravel\LaravelHelper;
+use Helpers\LaravelHelper;
 use Drivers\Laravel\LaravelService;
 use \Mockery;
 
@@ -249,22 +249,6 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('string', $service->getColumnType($column));
 
         }
-
-    }
-
-    public function testFilterTableFieldType()
-    {
-
-        $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
-
-        $service = new LaravelService($model, new LaravelHelper());
-
-        $this->assertEquals('string', $service->filterTableFieldType('varchar(45)'));
-        $this->assertEquals('integer', $service->filterTableFieldType('integer(10)'));
-        $this->assertEquals('float', $service->filterTableFieldType('float'));
-        $this->assertEquals('boolean', $service->filterTableFieldType('boolean'));
-        $this->assertEquals('mixed', $service->filterTableFieldType('mixed'));
-        $this->assertEquals('', $service->filterTableFieldType('something'));
 
     }
 

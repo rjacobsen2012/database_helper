@@ -1,8 +1,9 @@
 <?php namespace Factories;
 
 use Helpers\ConfigHelper;
-use Drivers\Laravel\LaravelHelper;
-use Drivers\Database\Mysql\MysqlHelper;
+use Helpers\LaravelHelper;
+use Helpers\MysqlHelper;
+use Helpers\DatabaseHelper;
 use Loaders\ModelLoader;
 use Drivers\Database\Mysql\MysqlRepository;
 use Drivers\Laravel\LaravelService;
@@ -82,8 +83,8 @@ class MapperFactory
 
                 return new DatabaseService(
                     $this->name,
-                    new MysqlRepository(new mysqli, $this->dbconfig, new MysqlHelper()),
-                    new MysqlHelper()
+                    new DatabaseHelper(),
+                    new MysqlRepository(new mysqli, $this->dbconfig, new MysqlHelper())
                 );
 
                 break;

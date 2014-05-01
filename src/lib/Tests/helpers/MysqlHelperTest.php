@@ -1,6 +1,6 @@
 <?php namespace Tests;
 
-use Drivers\Database\Mysql\MysqlHelper;
+use Helpers\MysqlHelper;
 
 class MysqlHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -113,6 +113,26 @@ class MysqlHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertFalse($this->helper->isMixed('tom'));
+
+    }
+
+    public function testFilterTableFieldType()
+    {
+
+        $types = [
+            'string' => 'varchar(45)',
+            'integer' => 'integer(11)',
+            'float' => 'float',
+            'boolean' => 'boolean',
+            'mixed' => 'mixed',
+            '' => 'joe'
+        ];
+
+        foreach ($types as $type => $test) {
+
+            $this->assertEquals($type, $this->helper->filterTableFieldType($test));
+
+        }
 
     }
 

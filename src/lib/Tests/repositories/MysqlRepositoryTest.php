@@ -1,7 +1,10 @@
 <?php namespace Tests\repositories;
 
-use Drivers\Database\Mysql\MysqlHelper;
+use Helpers\MysqlHelper;
 use Drivers\Database\Mysql\MysqlRepository;
+use Helpers\LaravelHelper;
+use Drivers\Laravel\LaravelService;
+use Helpers\ConfigHelper;
 use \Mockery;
 
 class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -99,6 +102,135 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetSchema()
+    {
+
+        $model = 'User';
+
+        $mysqli = Mockery::mock('\mysqli');
+        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
+        $database = $mysqlRepository->getSchema();
+        $this->assertEquals('newdb', $database);
+
+    }
+
+    public function testGetModelDates()
+    {
+
+        $model = 'User';
+
+        $mysqli = Mockery::mock('\mysqli');
+        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
+        $database = $mysqlRepository->getModelDates();
+        $this->assertNull($database);
+
+    }
+
+    public function testGetTableSchemaManager()
+    {
+
+        $model = 'User';
+
+        $mysqli = Mockery::mock('\mysqli');
+        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
+        $database = $mysqlRepository->getTableSchemaManager();
+        $this->assertNull($database);
+
+    }
+
     public function testCheckForTableFails()
     {
 
@@ -182,10 +314,24 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
+        $mysqlRepository = $this->getMock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            [
+                'filterColumns'
+            ],
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+        $mysqlRepository->expects($this->any())
+            ->method('filterColumns')
+            ->withAnyParameters()
+            ->willReturn([]);
+
         $found = $mysqlRepository->getColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
+        $this->assertEquals([], $found);
 
     }
 
@@ -227,14 +373,132 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getColumns($model);
-        $this->assertNull($found);
+        $mysqlRepository = $this->getMock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            [
+                'filterColumns'
+            ],
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+
+        $this->assertNull($mysqlRepository->getColumns($model));
 
     }
 
-    public function testGetTableColumnsRegularCasePasses()
+    public function testFilterColumns()
+    {
+
+        $columns = [
+            'id' => [
+                'Field' => 'id',
+                'Type' => 'integer',
+                'Null' => 'NO'
+            ],
+            'name' => [
+                'Field' => 'name',
+                'Type' => 'varchar(45)',
+                'Null' => 'NO'
+            ],
+            'subdomain' => [
+                'Field' => 'subdomain',
+                'Type' => 'varchar(25)',
+                'Null' => 'YES'
+            ],
+            'created_at' => [
+                'Field' => 'created_at',
+                'Type' => 'timestamp',
+                'Null' => 'NO'
+            ]
+        ];
+
+        $model = 'User';
+
+        $mysqli = $this->getMock(
+            '\mysqli',
+            ['query', 'fetch_assoc', 'real_connect', 'num_rows']
+        );
+        $mysqli->num_rows = 1;
+        $mysqli->expects($this->any())
+            ->method('real_connect')
+            ->withAnyParameters()
+            ->willReturn($mysqli);
+
+        $mysqli->expects($this->any())
+            ->method('num_rows')
+            ->withAnyParameters()
+            ->willReturn(1);
+
+        $mysqli->expects($this->any())
+            ->method('query')
+            ->withAnyParameters()
+            ->willReturn($mysqli);
+
+        $mysqli->expects($this->at(2))
+            ->method('fetch_assoc')
+            ->withAnyParameters()
+            ->willReturn($columns['id']);
+
+        $mysqli->expects($this->at(3))
+            ->method('fetch_assoc')
+            ->withAnyParameters()
+            ->willReturn($columns['name']);
+
+        $mysqli->expects($this->at(4))
+            ->method('fetch_assoc')
+            ->withAnyParameters()
+            ->willReturn($columns['subdomain']);
+
+        $mysqli->expects($this->at(5))
+            ->method('fetch_assoc')
+            ->withAnyParameters()
+            ->willReturn($columns['created_at']);
+
+        $mysqli->expects($this->at(6))
+            ->method('fetch_assoc')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
+        $mysqlRepository->getTable('User');
+        $columnsParsed = $mysqlRepository->filterColumns($mysqli);
+        $this->assertEquals($columns, $columnsParsed);
+
+    }
+
+    public function testGetTableRegular()
     {
 
         $model = 'User';
@@ -242,7 +506,6 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
         $mysqli->num_rows = 1;
 
         $config = Mockery::mock('Helpers\ConfigHelper');
@@ -274,63 +537,26 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getTableColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
+
+        $this->assertEquals('User', $mysqlRepository->getTable('User'));
 
     }
 
-    public function testGetTableColumnsLowerCasePasses()
+    public function testGetTableRegularPlural()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
+        $modelA = 'User';
+        $modelB = 'Users';
 
         $mysqliA = Mockery::mock('\mysqli');
         $mysqliA->num_rows = 0;
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE 'User'")->andReturn($mysqliA);
-        $mysqliB = $mysqli;
+        $mysqliB = Mockery::mock('\mysqli');
         $mysqliB->num_rows = 1;
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE 'user'")->andReturn($mysqliB);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM user")->andReturn($mysqliB);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getTableColumns('User');
-        $this->assertTrue($found instanceof \mysqli);
-
-    }
-
-    public function testGetTableColumnsThrowsException()
-    {
+        $mysqli = Mockery::mock('\mysqli');
+        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelA."'")->andReturn($mysqliA);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
 
         $config = Mockery::mock('Helpers\ConfigHelper');
         $config->shouldReceive('setConfig')->withArgs(
@@ -359,40 +585,32 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'someport',
             'somesocket'
         );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+
+        $this->assertEquals('Users', $mysqlRepository->getTable('User'));
+
+    }
+
+    public function testGetTableLower()
+    {
+
+        $modelA = 'User';
+        $modelB = 'Users';
+        $modelC = 'user';
 
         $mysqliA = Mockery::mock('\mysqli');
         $mysqliA->num_rows = 0;
+        $mysqliB = Mockery::mock('\mysqli');
+        $mysqliB->num_rows = 0;
+        $mysqliC = Mockery::mock('\mysqli');
+        $mysqliC->num_rows = 1;
 
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE 'User'")->andReturn($mysqliA);
-        $mysqliB = $mysqli;
-        $mysqliB->num_rows = 0;
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE 'user'")->andReturn($mysqliB);
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $this->setExpectedException('Exception');
-
-        $e = null;
-
-        try {
-
-            $found = $mysqlRepository->getTableColumns('User');
-
-        } catch (Mockery\Exception $e) {
-
-
-
-        }
-
-        $this->assertTrue($e instanceof Mockery\Exception, "Method getResponse should have thrown an exception");
-
-    }
-
-    public function testGetColumnName()
-    {
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelA."'")->andReturn($mysqliA);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
 
         $config = Mockery::mock('Helpers\ConfigHelper');
         $config->shouldReceive('setConfig')->withArgs(
@@ -422,15 +640,125 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+
+        $this->assertEquals('user', $mysqlRepository->getTable('User'));
+
+    }
+
+    public function testGetTableLowerPlural()
+    {
+
+        $modelA = 'User';
+        $modelB = 'Users';
+        $modelC = 'user';
+        $modelD = 'users';
+
+        $mysqliA = Mockery::mock('\mysqli');
+        $mysqliA->num_rows = 0;
+        $mysqliB = Mockery::mock('\mysqli');
+        $mysqliB->num_rows = 0;
+        $mysqliC = Mockery::mock('\mysqli');
+        $mysqliC->num_rows = 0;
+        $mysqliD = Mockery::mock('\mysqli');
+        $mysqliD->num_rows = 1;
+
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelA."'")->andReturn($mysqliA);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelD."'")->andReturn($mysqliD);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
 
-        $column = ['Field' => 'name'];
-        $name = $mysqlRepository->getColumnName($column);
-        $this->assertEquals('name', $name);
+        $this->assertEquals('users', $mysqlRepository->getTable('User'));
+
+    }
+
+    public function testGetTableNotFound()
+    {
+
+        $modelA = 'User';
+        $modelB = 'Users';
+        $modelC = 'user';
+        $modelD = 'users';
+
+        $mysqliA = Mockery::mock('\mysqli');
+        $mysqliA->num_rows = 0;
+        $mysqliB = Mockery::mock('\mysqli');
+        $mysqliB->num_rows = 0;
+        $mysqliC = Mockery::mock('\mysqli');
+        $mysqliC->num_rows = 0;
+        $mysqliD = Mockery::mock('\mysqli');
+        $mysqliD->num_rows = 0;
+
+        $mysqli = Mockery::mock('\mysqli');
+        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelA."'")->andReturn($mysqliA);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
+        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelD."'")->andReturn($mysqliD);
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+
+        $this->assertNull($mysqlRepository->getTable('User'));
 
     }
 
@@ -473,91 +801,11 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $column = ['Type' => 'varchar'];
         $type = $mysqlRepository->getColumnType($column);
-        $this->assertEquals('varchar', $type);
+        $this->assertEquals('string', $type);
 
-    }
-
-    public function testGetTableSchemaManager()
-    {
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $schema = $mysqlRepository->getTableSchemaManager();
-        $this->assertNull($schema);
-
-    }
-
-    public function testGetModelDates()
-    {
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $dates = $mysqlRepository->getModelDates();
-        $this->assertNull($dates);
+        $column = ['Type' => 'timestamp'];
+        $type = $mysqlRepository->getColumnType($column);
+        $this->assertEquals('\Carbon\Carbon', $type);
 
     }
 
@@ -599,7 +847,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqlRepository->setDbConnection();
 
         $column = ['Null' => 'NO'];
-        $required = $mysqlRepository->isRequired($column);
+        $required = $mysqlRepository->getRequired($column);
         $this->assertTrue($required);
 
     }
@@ -642,7 +890,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqlRepository->setDbConnection();
 
         $column = ['Null' => 'YES'];
-        $required = $mysqlRepository->isRequired($column);
+        $required = $mysqlRepository->getRequired($column);
         $this->assertFalse($required);
 
     }
@@ -734,561 +982,6 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $column = ['Type' => 'varchar'];
         $isdate = $mysqlRepository->isColumnDate($column);
         $this->assertFalse($isdate);
-
-    }
-
-    public function testGetModelTable()
-    {
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $model = 'user';
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
-        $mysqli->num_rows = 1;
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $mysqlRepository->checkForTable($model);
-        $this->assertEquals($model, $mysqlRepository->getModelTable());
-
-    }
-
-    public function testFetchRow()
-    {
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $result_rows = [
-            'Field' => 'id',
-            'Type' => 'integer(10)',
-            'Null' => 'NO'
-        ];
-
-        $model = 'user';
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
-        $mysqli->shouldReceive('fetch_assoc')->once()->andReturn($result_rows);
-        $mysqli->num_rows = 1;
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $mysqlRepository->checkForTable($model);
-        $found = $mysqlRepository->getColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
-        $this->assertEquals($result_rows, $mysqlRepository->fetchRow());
-
-    }
-
-    public function testFilterTableFieldType()
-    {
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-
-        $this->assertEquals('string', $mysqlRepository->filterTableFieldType('varchar(45)'));
-        $this->assertEquals('integer', $mysqlRepository->filterTableFieldType('integer(10)'));
-        $this->assertEquals('float', $mysqlRepository->filterTableFieldType('float'));
-        $this->assertEquals('boolean', $mysqlRepository->filterTableFieldType('boolean'));
-        $this->assertEquals('mixed', $mysqlRepository->filterTableFieldType('mixed'));
-        $this->assertEquals('', $mysqlRepository->filterTableFieldType('something'));
-
-    }
-
-    public function testFilterTableColumns()
-    {
-
-        $model = 'User';
-
-        $result_rows = [
-            [
-                'Field' => 'id',
-                'Type' => 'integer(10)',
-                'Null' => 'NO'
-            ],
-            [
-                'Field' => 'name',
-                'Type' => 'string(16)',
-                'Null' => 'YES'
-            ],
-            [
-                'Field' => 'created_at',
-                'Type' => 'timestamp',
-                'Null' => 'YES'
-            ]
-        ];
-
-        $count = 0;
-
-        $mysqli_result = Mockery::mock('\mysqli_result');
-        $mysqli_result->shouldReceive('fetch_assoc');
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
-        $mysqli->num_rows = 1;
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-
-        $mysqlRepository = $this->getMock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            ['fetchRow'],
-            [
-                $mysqli,
-                $config,
-                new MysqlHelper()
-            ]
-        );
-        $mysqlRepository->expects($this->at(0))
-            ->method('fetchRow')
-            ->willReturn($result_rows[0]);
-        $mysqlRepository->expects($this->at(1))
-            ->method('fetchRow')
-            ->willReturn($result_rows[1]);
-        $mysqlRepository->expects($this->at(2))
-            ->method('fetchRow')
-            ->willReturn($result_rows[2]);
-        $mysqlRepository->expects($this->at(3))
-            ->method('fetchRow')
-            ->willReturn(false);
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
-
-        $mysqlRepository->filterTableColumns();
-
-    }
-
-    public function testSetGetProperty()
-    {
-
-        $mysqlRepository = new MysqlRepository(
-            Mockery::mock('\mysqli'),
-            Mockery::mock('Helpers\ConfigHelper'),
-            new MysqlHelper()
-        );
-
-        $mysqlRepository->setProperty('subdomain');
-        $property = $mysqlRepository->getProperty('subdomain');
-        $this->assertFalse(is_null($property));
-
-        $property = $mysqlRepository->getProperty('name');
-        $this->assertTrue(is_null($property));
-
-    }
-
-    public function testSetGetPropertyType()
-    {
-
-        $mysqlRepository = new MysqlRepository(
-            Mockery::mock('\mysqli'),
-            Mockery::mock('Helpers\ConfigHelper'),
-            new MysqlHelper()
-        );
-
-        $mysqlRepository->setProperty('subdomain');
-
-        $mysqlRepository->setPropertyType('subdomain', 'string');
-        $this->assertEquals('string', $mysqlRepository->getPropertyType('subdomain'));
-        $this->assertNull($mysqlRepository->getPropertyType('name'));
-
-    }
-
-    public function testSetGetPropertyRead()
-    {
-
-        $mysqlRepository = new MysqlRepository(
-            Mockery::mock('\mysqli'),
-            Mockery::mock('Helpers\ConfigHelper'),
-            new MysqlHelper()
-        );
-
-        $mysqlRepository->setProperty('subdomain');
-
-        $mysqlRepository->setPropertyRead('subdomain', true);
-        $this->assertTrue($mysqlRepository->getPropertyRead('subdomain'));
-        $this->assertNull($mysqlRepository->getPropertyRead('name'));
-
-    }
-
-    public function testSetGetPropertyWrite()
-    {
-
-        $mysqlRepository = new MysqlRepository(
-            Mockery::mock('\mysqli'),
-            Mockery::mock('Helpers\ConfigHelper'),
-            new MysqlHelper()
-        );
-
-        $mysqlRepository->setProperty('subdomain');
-
-        $mysqlRepository->setPropertyWrite('subdomain', true);
-        $this->assertTrue($mysqlRepository->getPropertyWrite('subdomain'));
-        $this->assertNull($mysqlRepository->getPropertyWrite('name'));
-
-    }
-
-    public function testSetGetPropertyRequired()
-    {
-
-        $mysqlRepository = new MysqlRepository(
-            Mockery::mock('\mysqli'),
-            Mockery::mock('Helpers\ConfigHelper'),
-            new MysqlHelper()
-        );
-
-        $mysqlRepository->setProperty('subdomain');
-
-        $mysqlRepository->setPropertyRequired('subdomain', true);
-        $this->assertTrue($mysqlRepository->getPropertyRequired('subdomain'));
-        $this->assertNull($mysqlRepository->getPropertyRequired('name'));
-
-    }
-
-    public function testGetTableProperties()
-    {
-
-        $model = 'User';
-
-        $result_rows = [
-            [
-                'Field' => 'id',
-                'Type' => 'integer(10)',
-                'Null' => 'NO'
-            ],
-            [
-                'Field' => 'name',
-                'Type' => 'string(16)',
-                'Null' => 'YES'
-            ],
-            [
-                'Field' => 'created_at',
-                'Type' => 'timestamp',
-                'Null' => 'YES'
-            ]
-        ];
-
-        $expected = [
-            'id' => [
-                'type' => 'integer',
-                'read' => true,
-                'write' => true,
-                'required' => true
-            ],
-            'name' => [
-                'type' => 'string',
-                'read' => true,
-                'write' => true,
-                'required' => false
-            ],
-            'created_at' => [
-                'type' => '\Carbon\Carbon',
-                'read' => true,
-                'write' => true,
-                'required' => false
-            ]
-        ];
-
-        $count = 0;
-
-        $mysqli_result = Mockery::mock('\mysqli_result');
-        $mysqli_result->shouldReceive('fetch_assoc');
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
-        $mysqli->num_rows = 1;
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-
-        $mysqlRepository = $this->getMock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            ['fetchRow'],
-            [
-                $mysqli,
-                $config,
-                new MysqlHelper()
-            ]
-        );
-        $mysqlRepository->expects($this->at(0))
-            ->method('fetchRow')
-            ->willReturn($result_rows[0]);
-        $mysqlRepository->expects($this->at(1))
-            ->method('fetchRow')
-            ->willReturn($result_rows[1]);
-        $mysqlRepository->expects($this->at(2))
-            ->method('fetchRow')
-            ->willReturn($result_rows[2]);
-        $mysqlRepository->expects($this->at(3))
-            ->method('fetchRow')
-            ->willReturn(false);
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
-
-        $mysqlRepository->filterTableColumns();
-
-        $this->assertEquals($expected, $mysqlRepository->getTableProperties());
-
-    }
-
-    public function testGetModelTableInfo()
-    {
-
-        $model = 'User';
-
-        $result_rows = [
-            [
-                'Field' => 'id',
-                'Type' => 'integer(10)',
-                'Null' => 'NO'
-            ],
-            [
-                'Field' => 'name',
-                'Type' => 'string(16)',
-                'Null' => 'YES'
-            ],
-            [
-                'Field' => 'created_at',
-                'Type' => 'timestamp',
-                'Null' => 'YES'
-            ]
-        ];
-
-        $expected = [
-            'properties' => [
-                'id' => [
-                    'type' => 'integer',
-                    'read' => true,
-                    'write' => true,
-                    'required' => true
-                ],
-                'name' => [
-                    'type' => 'string',
-                    'read' => true,
-                    'write' => true,
-                    'required' => false
-                ],
-                'created_at' => [
-                    'type' => '\Carbon\Carbon',
-                    'read' => true,
-                    'write' => true,
-                    'required' => false
-                ]
-            ]
-        ];
-
-        $count = 0;
-
-        $mysqli_result = Mockery::mock('\mysqli_result');
-        $mysqli_result->shouldReceive('fetch_assoc');
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-        $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
-        $mysqli->num_rows = 1;
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-
-        $mysqlRepository = $this->getMock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            ['fetchRow'],
-            [
-                $mysqli,
-                $config,
-                new MysqlHelper()
-            ]
-        );
-        $mysqlRepository->expects($this->at(0))
-            ->method('fetchRow')
-            ->willReturn($result_rows[0]);
-        $mysqlRepository->expects($this->at(1))
-            ->method('fetchRow')
-            ->willReturn($result_rows[1]);
-        $mysqlRepository->expects($this->at(2))
-            ->method('fetchRow')
-            ->willReturn($result_rows[2]);
-        $mysqlRepository->expects($this->at(3))
-            ->method('fetchRow')
-            ->willReturn(false);
-        $mysqlRepository->setDbConnection();
-        $found = $mysqlRepository->getColumns($model);
-        $this->assertTrue($found instanceof \mysqli);
-
-        $mysqlRepository->filterTableColumns();
-
-        $this->assertEquals($expected, $mysqlRepository->getModelTableInfo());
 
     }
 

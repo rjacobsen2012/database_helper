@@ -13,4 +13,13 @@ interface HelperInterface
 
     public function isMixed($type);
 
+    /**
+     * @param $type
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function filterTableFieldType($type);
+
 }

@@ -8,6 +8,24 @@
 interface ServicesInterface
 {
 
+    public function setDefaults();
+
+    public function setTable();
+
+    public function getTable();
+
+    public function setSchema();
+
+    public function getSchema();
+
+    public function setColumns();
+
+    public function getColumns();
+
+    public function getProperties();
+
+
+
     /**
      * @access public
      *
@@ -76,15 +94,6 @@ interface ServicesInterface
      * @return mixed
      */
     public function getColumnType($column);
-
-    /**
-     * @param $type
-     *
-     * @access public
-     *
-     * @return mixed
-     */
-    public function filterTableFieldType($type);
 
     /**
      * @param      $name

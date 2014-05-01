@@ -5,14 +5,10 @@ use Contracts\HelperInterface;
 use mysqli;
 use Helpers\StringHelper;
 use Contracts\RepositoryInterface;
+use SebastianBergmann\Exporter\Exception;
 
 class MysqlRepository implements RepositoryInterface
 {
-
-    /**
-     * @access protected
-     */
-    protected $model;
 
     /**
      * @var \Helpers\HelperInterface $helper
@@ -84,34 +80,24 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
-    public function getTableColumns($model)
+    public function getTable($model)
     {
 
         if ($this->checkForTable($model)) {
 
-            return $this->getColumns($model);
+            return $model;
+
+        } elseif ($this->checkForTable(StringHelper::toPlural($model))) {
+
+            return StringHelper::toPlural($model);
 
         } elseif ($this->checkForTable(StringHelper::toLower($model))) {
 
-            return $this->getColumns(StringHelper::toLower($model));
+            return StringHelper::toLower($model);
 
-        } else {
+        } elseif ($this->checkForTable(StringHelper::toPlural(StringHelper::toLower($model)))) {
 
-            throw new \Exception("[{$model}] table was not found.");
-
-        }
-
-    }
-
-    public function getColumns($model)
-    {
-
-        $result = $this->getDbConnection()->query("SHOW COLUMNS FROM ".$model);
-
-        if ($result->num_rows > 0) {
-
-            $this->columns = $result;
-            return $this->columns;
+            return StringHelper::toPlural(StringHelper::toLower($model));
 
         }
 
@@ -126,7 +112,6 @@ class MysqlRepository implements RepositoryInterface
 
         if ($result->num_rows == 1) {
 
-            $this->table = $model;
             return true;
 
         }
@@ -135,23 +120,26 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
-    public function getModelTableInfo()
+    public function getSchema()
     {
 
-        return [
-            'properties' => $this->properties
-        ];
+        return $this->config->getDatabase();
 
     }
 
-    public function getTableProperties()
+    public function getColumns($model)
     {
-        return $this->properties;
-    }
 
-    public function getModelTable()
-    {
-        return $this->table;
+        $result = $this->getDbConnection()->query("SHOW COLUMNS FROM ".$model);
+
+        if ($result->num_rows > 0) {
+
+            return $this->filterColumns($result);
+
+        }
+
+        return null;
+
     }
 
     public function getTableSchemaManager()
@@ -164,33 +152,25 @@ class MysqlRepository implements RepositoryInterface
         return null;
     }
 
-    public function fetchRow()
+    /**
+     * @param $columns
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function filterColumns($columns)
     {
 
-        return $this->columns->fetch_assoc();
+        $columnsParsed = [];
 
-    }
+        while ($column = $columns->fetch_assoc()) {
 
-    public function filterTableColumns()
-    {
-
-        while ($column = $this->fetchRow()) {
-
-            $name = $this->getColumnName($column);
-
-            if ($this->isColumnDate($column)) {
-
-                $type = '\Carbon\Carbon';
-
-            } else {
-
-                $type = $this->filterTableFieldType($this->getColumnType($column));
-
-            }
-
-            $this->addProperty($name, $type, $this->isRequired($column), true, true);
+            $columnsParsed[$this->getColumnName($column)] = $column;
 
         }
+
+        return $columnsParsed;
 
     }
 
@@ -201,6 +181,7 @@ class MysqlRepository implements RepositoryInterface
 
     public function isColumnDate($column)
     {
+
         $type = $column['Type'];
 
         if (strpos($type, 'date') !== false || strpos($type, 'time') !== false) {
@@ -210,14 +191,25 @@ class MysqlRepository implements RepositoryInterface
         }
 
         return false;
+
     }
 
     public function getColumnType($column)
     {
-        return $column['Type'];
+
+        if ($this->isColumnDate($column)) {
+
+            return '\Carbon\Carbon';
+
+        } else {
+
+            return $this->helper->filterTableFieldType($column['Type']);
+
+        }
+
     }
 
-    public function isRequired($column)
+    public function getRequired($column)
     {
 
         if ($column['Null'] == 'NO') {
@@ -227,188 +219,6 @@ class MysqlRepository implements RepositoryInterface
         }
 
         return false;
-
-    }
-
-    public function filterTableFieldType($type)
-    {
-
-        switch ($type) {
-
-            case $this->helper->isString($type):
-
-                return 'string';
-
-                break;
-
-            case $this->helper->isInteger($type):
-
-                return 'integer';
-
-                break;
-
-            case $this->helper->isDecimal($type):
-
-                return 'float';
-
-                break;
-
-            case $this->helper->isBoolean($type):
-
-                return 'boolean';
-
-                break;
-
-            case $this->helper->isMixed($type):
-
-                return 'mixed';
-
-                break;
-
-            default:
-
-                return '';
-
-        }
-
-    }
-
-    public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
-    {
-
-        $this->setProperty($name);
-        $this->setPropertyType($name, $type);
-        $this->setPropertyRead($name, $read);
-        $this->setPropertyWrite($name, $write);
-        $this->setPropertyRequired($name, $required);
-
-    }
-
-    public function setProperty($name)
-    {
-
-        if (!isset($this->properties[$name])) {
-
-            $this->properties[$name] = [];
-
-        }
-
-    }
-
-    public function getProperty($name)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            return $this->properties[$name];
-
-        }
-
-        return null;
-
-    }
-
-    public function setPropertyType($name, $type = 'mixed')
-    {
-
-        if (isset($this->properties[$name])) {
-
-            $this->properties[$name]['type'] = $type;
-
-        }
-
-        return null;
-
-    }
-
-    public function getPropertyType($name)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            return $this->properties[$name]['type'];
-
-        }
-
-        return null;
-
-    }
-
-    public function setPropertyRead($name, $read)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            $this->properties[$name]['read'] = $read;
-
-        }
-
-        return null;
-
-    }
-
-    public function getPropertyRead($name)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            return $this->properties[$name]['read'];
-
-        }
-
-        return null;
-
-    }
-
-    public function setPropertyWrite($name, $write)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            $this->properties[$name]['write'] = $write;
-
-        }
-
-        return null;
-
-    }
-
-    public function getPropertyWrite($name)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            return $this->properties[$name]['write'];
-
-        }
-
-        return null;
-
-    }
-
-    public function setPropertyRequired($name, $required)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            $this->properties[$name]['required'] = $required;
-
-        }
-
-        return null;
-
-    }
-
-    public function getPropertyRequired($name)
-    {
-
-        if (isset($this->properties[$name])) {
-
-            return $this->properties[$name]['required'];
-
-        }
-
-        return null;
 
     }
 

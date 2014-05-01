@@ -3,6 +3,8 @@
 use Contracts\HelperInterface;
 use Contracts\RepositoryInterface;
 use Contracts\ServicesInterface;
+use Helpers\DatabaseHelper;
+use Helpers\ServiceHelper;
 
 /**
  * Class DatabaseHelper
@@ -15,7 +17,32 @@ class DatabaseService implements ServicesInterface
     /**
      * @var $model
      */
-    protected $model;
+    protected $model = null;
+
+    /**
+     * @var $table
+     */
+    protected $table = null;
+
+    /**
+     * @access protected
+     */
+    protected $columns = null;
+
+    /**
+     * @access protected
+     */
+    protected $properties = null;
+
+    /**
+     * @access protected
+     */
+    protected $schema = null;
+
+    /**
+     * @access protected
+     */
+    protected $helper;
 
     /**
      * @access protected
@@ -26,32 +53,85 @@ class DatabaseService implements ServicesInterface
     protected $repository;
 
     /**
-     * @param string                 $model
-     * @param \Contracts\RepositoryInterface     $repository
-     * @param \Contracts\HelperInterface              $helper
+     * @param string                                $model
+     * @param \Contracts\HelperInterface            $helper
+     * @param \Contracts\RepositoryInterface        $repository
      *
      * @access public
      */
-    public function __construct($model, RepositoryInterface $repository)
+    public function __construct($model, HelperInterface $helper, RepositoryInterface $repository)
     {
 
         $this->model = $model;
+        $this->helper = $helper;
         $this->repository = $repository;
 
     }
 
-    /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getTableColumns()
+    public function setDefaults()
     {
 
-        return $this->repository->getTableColumns($this->model);
+        $this->setTable();
+        $this->setSchema();
+        $this->setColumns();
+        $this->filterTableColumns();
 
     }
 
+    public function setTable()
+    {
+
+        $this->table = $this->repository->getTable($this->model);
+
+        if (!$this->table) {
+
+            throw new \Exception("[{$this->model}] table was not found.");
+
+        }
+
+    }
+
+    public function getTable()
+    {
+
+        return $this->table;
+
+    }
+
+    public function setSchema()
+    {
+
+        $this->schema = $this->repository->getSchema();
+
+    }
+
+    public function getSchema()
+    {
+
+        return $this->schema;
+
+    }
+
+    public function setColumns()
+    {
+
+        $this->columns = $this->repository->getColumns($this->table);
+
+    }
+
+    public function getColumns()
+    {
+
+        return $this->columns;
+
+    }
+
+    public function getProperties()
+    {
+
+        return $this->properties;
+
+    }
 
     /**
      * @access public
@@ -60,7 +140,9 @@ class DatabaseService implements ServicesInterface
      */
     public function getModelTableInfo()
     {
-        return $this->repository->getModelTableInfo();
+        return [
+            'properties' => $this->getProperties()
+        ];
     }
 
     /**
@@ -70,7 +152,7 @@ class DatabaseService implements ServicesInterface
      */
     public function getTableProperties()
     {
-        return $this->repository->getTableProperties();
+        return $this->getProperties();
     }
 
     /**
@@ -80,7 +162,7 @@ class DatabaseService implements ServicesInterface
      */
     public function getModelTable()
     {
-        return $this->repository->getModelTable();
+        return $this->table;
     }
 
     /**
@@ -91,6 +173,18 @@ class DatabaseService implements ServicesInterface
     public function getTableSchemaManager()
     {
         return $this->repository->getTableSchemaManager();
+    }
+
+    /**
+     * @access public
+     *
+     * @return mixed
+     */
+    public function getTableColumns()
+    {
+
+        return $this->getColumns($this->model);
+
     }
 
     /**
@@ -112,7 +206,19 @@ class DatabaseService implements ServicesInterface
      */
     public function filterTableColumns()
     {
-        return $this->repository->filterTableColumns();
+
+        foreach ($this->columns as $field => $column) {
+
+            $this->addProperty(
+                $this->getColumnName($column),
+                $this->getColumnType($column),
+                $this->getColumnRequired($column),
+                true,
+                true
+            );
+
+        }
+
     }
 
     /**
@@ -140,15 +246,15 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @param $type
+     * @param $column
      *
      * @access public
      *
      * @return mixed
      */
-    public function filterTableFieldType($type)
+    public function getColumnRequired($column)
     {
-        return $this->repository->filterTableFieldType($type);
+        return $this->repository->getRequired($column);
     }
 
     /**
@@ -161,78 +267,102 @@ class DatabaseService implements ServicesInterface
      *
      * @return mixed
      */
-    public function addProperty($name, $type = null, $read = null, $write = null)
+    public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
     {
-        return $this->repository->addProperty($name, $type, $read, $write);
+        $this->setProperty($name);
+        $this->setPropertyType($name, $type);
+        $this->setPropertyRead($name, $read);
+        $this->setPropertyWrite($name, $write);
+        $this->setPropertyRequired($name, $required);
     }
 
     public function setProperty($name)
     {
 
-        return $this->repository->setProperty($name);
+        if (!isset($this->properties[$name])) {
+
+            $this->properties[$name] = [];
+
+        }
 
     }
 
     public function getProperty($name)
     {
 
-        return $this->repository->getProperty($name);
+        return $this->properties[$name];
 
     }
 
     public function setPropertyType($name, $type = 'mixed')
     {
 
-        return $this->repository->setPropertyType($name, $type);
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['type'] = $type;
+
+        }
 
     }
 
     public function getPropertyType($name)
     {
 
-        return $this->repository->getPropertyType($name);
+        return $this->properties[$name]['type'];
 
     }
 
     public function setPropertyRead($name, $read)
     {
 
-        return $this->repository->setPropertyRead($name, $read);
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['read'] = $read;
+
+        }
 
     }
 
     public function getPropertyRead($name)
     {
 
-        return $this->repository->getPropertyRead($name);
+        return $this->properties[$name]['read'];
 
     }
 
     public function setPropertyWrite($name, $write)
     {
 
-        return $this->repository->setPropertyWrite($name, $write);
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['write'] = $write;
+
+        }
 
     }
 
     public function getPropertyWrite($name)
     {
 
-        return $this->repository->getPropertyWrite($name);
+        return $this->properties[$name]['write'];
 
     }
 
     public function setPropertyRequired($name, $required)
     {
 
-        return $this->repository->setPropertyRequired($name, $required);
+        if (isset($this->properties[$name])) {
+
+            $this->properties[$name]['required'] = $required;
+
+        }
 
     }
 
     public function getPropertyRequired($name)
     {
 
-        return $this->repository->getPropertyRequired($name);
+        return $this->properties[$name]['required'];
 
     }
 

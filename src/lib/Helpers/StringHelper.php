@@ -12,6 +12,13 @@ class StringHelper
 
     }
 
+    public static function toPlural($string)
+    {
+
+        return Str::plural($string);
+
+    }
+
     public static function toCamel($string)
     {
 

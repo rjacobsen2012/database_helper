@@ -43,16 +43,6 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     public function testGetFields()
     {
 
-        $expected = [
-            'type' => 'mysql',
-            'host' => '123.45.567.8',
-            'user' => 'someuser',
-            'password' => '1234',
-            'database' => 'newdb',
-            'port' => 'someport',
-            'socket' => 'somesocket'
-        ];
-
         $mapper = new \Mapper();
         $mapper->setDbConfig(
             'mysql',
@@ -65,22 +55,12 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $properties = $mapper->getFields('User');
-        $this->assertEquals([], $properties);
+        $this->assertEquals(null, $properties);
 
     }
 
     public function testGetInfo()
     {
-
-        $expected = [
-            'type' => 'mysql',
-            'host' => '123.45.567.8',
-            'user' => 'someuser',
-            'password' => '1234',
-            'database' => 'newdb',
-            'port' => 'someport',
-            'socket' => 'somesocket'
-        ];
 
         $mapper = new \Mapper();
         $mapper->setDbConfig(
@@ -94,7 +74,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $info = $mapper->getInfo('User');
-        $this->assertEquals(['properties' => []], $info);
+        $this->assertEquals(['properties' => null], $info);
 
     }
 

@@ -1,5 +1,6 @@
 <?php namespace Drivers\Laravel;
 
+use Helpers\LaravelHelper;
 use Illuminate\Database\Eloquent\Model;
 use Contracts\ServicesInterface;
 
@@ -209,7 +210,7 @@ class LaravelService implements ServicesInterface
 
                     $name = $this->getColumnName($column);
 
-                    $type = $this->filterTableFieldType($this->getColumnType($column));
+                    $type = $this->helper->filterTableFieldType($this->getColumnType($column));
 
                 }
 
@@ -243,56 +244,6 @@ class LaravelService implements ServicesInterface
     public function getColumnType($column)
     {
         return $column->getType()->getName();
-    }
-
-    /**
-     * @param $type
-     *
-     * @access public
-     *
-     * @return mixed
-     */
-    public function filterTableFieldType($type)
-    {
-
-        switch ($type) {
-
-            case $this->helper->isString($type):
-
-                return 'string';
-
-                break;
-
-            case $this->helper->isInteger($type):
-
-                return 'integer';
-
-                break;
-
-            case $this->helper->isDecimal($type):
-
-                return 'float';
-
-                break;
-
-            case $this->helper->isBoolean($type):
-
-                return 'boolean';
-
-                break;
-
-            case $this->helper->isMixed($type):
-
-                return 'mixed';
-
-                break;
-
-            default:
-
-                return '';
-
-        }
-
     }
 
     /**

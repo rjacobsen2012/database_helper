@@ -1,8 +1,8 @@
 <?php namespace Tests;
 
-use Helpers\LaravelHelper;
+use Helpers\DatabaseHelper;
 
-class LaravelHelperTest extends \PHPUnit_Framework_TestCase
+class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $helper;
@@ -11,7 +11,7 @@ class LaravelHelperTest extends \PHPUnit_Framework_TestCase
     {
 
         parent::setUp();
-        $this->helper = new LaravelHelper();
+        $this->helper = new DatabaseHelper();
 
     }
 

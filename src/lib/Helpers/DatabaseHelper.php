@@ -1,8 +1,8 @@
-<?php namespace Drivers\Database\Mysql;
+<?php namespace Helpers;
 
 use Contracts\HelperInterface;
 
-class MysqlHelper implements HelperInterface
+class DatabaseHelper implements HelperInterface
 {
 
     public function isString($type)
@@ -79,6 +79,54 @@ class MysqlHelper implements HelperInterface
 
         return false;
 
+    }
+
+    /**
+     * @param $type
+     *
+     * @access public
+     *
+     * @return mixed
+     */
+    public function filterTableFieldType($type)
+    {
+        switch ($type) {
+
+            case $this->isString($type):
+
+                return 'string';
+
+                break;
+
+            case $this->isInteger($type):
+
+                return 'integer';
+
+                break;
+
+            case $this->isDecimal($type):
+
+                return 'float';
+
+                break;
+
+            case $this->isBoolean($type):
+
+                return 'boolean';
+
+                break;
+
+            case $this->isMixed($type):
+
+                return 'mixed';
+
+                break;
+
+            default:
+
+                return '';
+
+        }
     }
 
 }
