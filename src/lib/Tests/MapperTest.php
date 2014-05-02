@@ -1,5 +1,9 @@
 <?php namespace Tests;
 
+use Drivers\Database\DatabaseService;
+use Factories\MapperFactory;
+use Helpers\ConfigHelper;
+use Helpers\MysqlHelper;
 use \Mockery;
 
 class MapperTest extends \PHPUnit_Framework_TestCase
@@ -37,6 +41,65 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expected, $mapper->getDbConfig());
+
+    }
+
+    public function testTestDbConnection()
+    {
+
+        $config = new ConfigHelper();
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory', 'build']
+        );
+
+        $mapperFactory = $this->getMock(
+            '\Factories\MapperFactory',
+            ['build'],
+            [
+                null,
+                $config
+            ]
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mysqli = Mockery::mock('\mysqli');
+
+        $mysqlRepo = Mockery::mock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+
+        $databaseService = $this->getMock(
+            '\Drivers\Database\DatabaseService',
+            ['testDbConnectionFails'],
+            [
+                null,
+                new MysqlHelper(),
+                $mysqlRepo
+            ]
+        );
+
+        $databaseService->expects($this->any())
+            ->method('testDbConnectionFails')
+            ->withAnyParameters()
+            ->willReturn(true);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn($databaseService);
+
+        $this->assertTrue($mapper->testDbConnection());
 
     }
 

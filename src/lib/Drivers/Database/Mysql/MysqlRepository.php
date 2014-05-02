@@ -67,14 +67,23 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
-    public function getDbConnection()
+    public function testDbConnectionFails()
     {
 
-        if (!$this->dbConnection instanceof mysqli) {
+        $this->setDbConnection();
 
-            $this->setDbConnection();
+        if ($this->getDbConnection()) {
+
+            return false;
 
         }
+
+        return true;
+
+    }
+
+    public function getDbConnection()
+    {
 
         return $this->dbConnection;
 

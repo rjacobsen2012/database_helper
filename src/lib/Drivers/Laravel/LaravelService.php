@@ -67,6 +67,11 @@ class LaravelService implements ServicesInterface
 
     }
 
+    public function testDbConnectionFails()
+    {
+        return false;
+    }
+
     public function setTable()
     {
 

@@ -68,6 +68,25 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testTestDbConnectionFails()
+    {
+
+        $mysqlSchemaManager = Mockery::mock('Doctrine\DBAL\Schema\MySqlSchemaManager');
+
+        $connection = Mockery::mock('Illuminate\Database\Connection');
+        $connection->shouldReceive('getDoctrineSchemaManager')
+            ->with('companies')
+            ->andReturn($mysqlSchemaManager);
+
+        $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
+        $model->shouldReceive('getTable')->andReturn('companies');
+        $model->shouldReceive('getConnection')->andReturn($connection);
+
+        $service = new LaravelService($model, new LaravelHelper());
+        $this->assertFalse($service->testDbConnectionFails());
+
+    }
+
     public function testSetGetSchema()
     {
 

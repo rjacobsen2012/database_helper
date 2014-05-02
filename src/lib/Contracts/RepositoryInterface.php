@@ -10,6 +10,8 @@ interface RepositoryInterface
 
     public function getDbConnection();
 
+    public function testDbConnectionFails();
+
     public function getTable($model);
 
     public function checkForTable($model);

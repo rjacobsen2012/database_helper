@@ -53,8 +53,6 @@ class MapperFactory
     public function build()
     {
 
-        $this->setRepository();
-
         if ($this->isLaravel()) {
 
             return new LaravelService(
@@ -63,6 +61,8 @@ class MapperFactory
             );
 
         } else {
+
+            $this->setRepository();
 
             if ($this->isValidRepository()) {
 
@@ -113,13 +113,17 @@ class MapperFactory
     public function isLaravel()
     {
 
-        $model = new ModelLoader();
-        $loadedModel = $model->loadModel($this->name);
+        if ($this->name) {
 
-        if ($loadedModel && $loadedModel instanceof Model) {
+            $model = new ModelLoader();
+            $loadedModel = $model->loadModel($this->name);
 
-            $this->model = $loadedModel;
-            return true;
+            if ($loadedModel && $loadedModel instanceof Model) {
+
+                $this->model = $loadedModel;
+                return true;
+
+            }
 
         }
 

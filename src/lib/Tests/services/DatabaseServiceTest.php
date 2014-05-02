@@ -298,6 +298,27 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testTestDbConnectionFails()
+    {
+
+        $mysqlRepo = Mockery::mock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            [
+                $this->mysqli,
+                $this->config,
+                new MysqlHelper()
+            ]
+        );
+        $mysqlRepo->shouldReceive('testDbConnectionFails')
+            ->withAnyArgs()
+            ->once()
+            ->andReturn(false);
+
+        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $this->assertFalse($databaseService->testDbConnectionFails());
+
+    }
+
     public function testGetColumnType()
     {
 

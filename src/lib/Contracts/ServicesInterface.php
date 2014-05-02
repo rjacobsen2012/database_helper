@@ -10,6 +10,8 @@ interface ServicesInterface
 
     public function setDefaults();
 
+    public function testDbConnectionFails();
+
     public function setTable();
 
     public function getTable();
@@ -23,8 +25,6 @@ interface ServicesInterface
     public function getColumns();
 
     public function getProperties();
-
-
 
     /**
      * @access public

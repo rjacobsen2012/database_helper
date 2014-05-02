@@ -57,6 +57,122 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testTestDbConnectionFailsPasses()
+    {
+
+        $mysqli = Mockery::mock('mysqli');
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = $this->getMock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            ['setDbConnection', 'getDbConnection'],
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+
+        $mysqlRepository->expects($this->any())
+            ->method('setDbConnection')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mysqlRepository->expects($this->any())
+            ->method('getDbConnection')
+            ->withAnyParameters()
+            ->willReturn($mysqli);
+
+        $error = $mysqlRepository->testDbConnectionFails();
+        $this->assertEquals(false, $error);
+
+    }
+
+    public function testTestDbConnectionFailsFails()
+    {
+
+        $mysqli = Mockery::mock('mysqli');
+
+        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config->shouldReceive('setConfig')->withArgs(
+            [
+                'mysql',
+                '123.45.567.8',
+                'someuser',
+                '1234',
+                'newdb',
+                'someport',
+                'somesocket'
+            ]
+        );
+        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
+        $config->shouldReceive('getUser')->andReturn('someuser');
+        $config->shouldReceive('getPassword')->andReturn('1234');
+        $config->shouldReceive('getDatabase')->andReturn('newdb');
+        $config->shouldReceive('getPort')->andReturn('someport');
+        $config->shouldReceive('getSocket')->andReturn('somesocket');
+        $config->setConfig(
+            'mysql',
+            '123.45.567.8',
+            'someuser',
+            '1234',
+            'newdb',
+            'someport',
+            'somesocket'
+        );
+
+        $mysqlRepository = $this->getMock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            ['setDbConnection', 'getDbConnection'],
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+
+        $mysqlRepository->expects($this->any())
+            ->method('setDbConnection')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mysqlRepository->expects($this->any())
+            ->method('getDbConnection')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $error = $mysqlRepository->testDbConnectionFails();
+        $this->assertEquals(true, $error);
+
+    }
+
     public function testCheckForTablePasses()
     {
 
@@ -330,6 +446,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn([]);
 
+        $mysqlRepository->setDbConnection();
         $found = $mysqlRepository->getColumns($model);
         $this->assertEquals([], $found);
 
@@ -385,6 +502,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $mysqlRepository->setDbConnection();
         $this->assertNull($mysqlRepository->getColumns($model));
 
     }
@@ -537,6 +655,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
 
         $this->assertEquals('User', $mysqlRepository->getTable('User'));
 
@@ -587,6 +706,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
 
         $this->assertEquals('Users', $mysqlRepository->getTable('User'));
 
@@ -641,6 +761,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
 
         $this->assertEquals('user', $mysqlRepository->getTable('User'));
 
@@ -699,6 +820,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
 
         $this->assertEquals('users', $mysqlRepository->getTable('User'));
 
@@ -757,6 +879,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository->setDbConnection();
 
         $this->assertNull($mysqlRepository->getTable('User'));
 

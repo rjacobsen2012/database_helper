@@ -33,11 +33,29 @@ class Mapper
         return $this->dbconfig->getConfig();
     }
 
+    public function getMapperFactory($name = null)
+    {
+
+        return new MapperFactory($name, $this->dbconfig);
+
+    }
+
+    public function testDbConnection()
+    {
+
+        /** @var \Factories\MapperFactory $mapperFactory */
+        $mapperFactory = $this->getMapperFactory();
+        /** @var \Contracts\ServicesInterface $mapper */
+        $mapper = $mapperFactory->build();
+        return $mapper->testDbConnectionFails();
+
+    }
+
     public function getFields($name)
     {
 
         /** @var \Factories\MapperFactory $mapperFactory */
-        $mapperFactory = new MapperFactory($name, $this->dbconfig);
+        $mapperFactory = $this->getMapperFactory($name);
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
         return $mapper->getTableProperties();
@@ -47,7 +65,8 @@ class Mapper
     public function getInfo($name)
     {
 
-        $mapperFactory = new MapperFactory($name, $this->dbconfig);
+        /** @var \Factories\MapperFactory $mapperFactory */
+        $mapperFactory = $this->getMapperFactory($name);
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
         return $mapper->getModelTableInfo();

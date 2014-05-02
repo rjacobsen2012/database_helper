@@ -68,6 +68,13 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    public function testDbConnectionFails()
+    {
+
+        return $this->repository->testDbConnectionFails();
+
+    }
+
     public function setDefaults()
     {
 
