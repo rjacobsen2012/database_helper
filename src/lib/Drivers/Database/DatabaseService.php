@@ -78,6 +78,7 @@ class DatabaseService implements ServicesInterface
     public function setDefaults()
     {
 
+        $this->repository->setDbConnection();
         $this->setTable();
         $this->setSchema();
         $this->setColumns();

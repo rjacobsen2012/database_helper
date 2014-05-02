@@ -56,7 +56,7 @@ class MysqlRepository implements RepositoryInterface
     public function setDbConnection()
     {
 
-        $this->dbConnection = $this->db->real_connect(
+        $this->db->real_connect(
             $this->config->getHost(),
             $this->config->getUser(),
             $this->config->getPassword(),
@@ -64,6 +64,7 @@ class MysqlRepository implements RepositoryInterface
             $this->config->getPort(),
             $this->config->getSocket()
         );
+        $this->dbConnection = $this->db;
 
     }
 

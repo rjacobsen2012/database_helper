@@ -751,6 +751,9 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyArgs()
             ->once()
             ->andReturn($columns);
+        $mysqlRepo->shouldReceive('setDbConnection')
+            ->withAnyArgs()
+            ->once();
 
         $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
         $databaseService->setTable();
