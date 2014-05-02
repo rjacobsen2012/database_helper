@@ -58,6 +58,7 @@ class Mapper
         $mapperFactory = $this->getMapperFactory($name);
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
+        $mapper->setDefaults();
         return $mapper->getTableProperties();
 
     }

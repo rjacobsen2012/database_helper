@@ -106,19 +106,64 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     public function testGetFields()
     {
 
-        $mapper = new \Mapper();
-        $mapper->setDbConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
+        $config = new ConfigHelper();
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory', 'build']
         );
 
-        $properties = $mapper->getFields('User');
-        $this->assertEquals(null, $properties);
+        $mapperFactory = $this->getMock(
+            '\Factories\MapperFactory',
+            ['build'],
+            [
+                null,
+                $config
+            ]
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mysqli = Mockery::mock('\mysqli');
+
+        $mysqlRepo = Mockery::mock(
+            'Drivers\Database\Mysql\MysqlRepository',
+            [
+                $mysqli,
+                $config,
+                new MysqlHelper()
+            ]
+        );
+
+        $databaseService = $this->getMock(
+            '\Drivers\Database\DatabaseService',
+            ['setDefaults', 'getTableProperties'],
+            [
+                null,
+                new MysqlHelper(),
+                $mysqlRepo
+            ]
+        );
+
+        $databaseService->expects($this->any())
+            ->method('setDefaults')
+            ->withAnyParameters()
+            ->willReturn($databaseService);
+
+        $databaseService->expects($this->any())
+            ->method('getTableProperties')
+            ->withAnyParameters()
+            ->willReturn([]);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn($databaseService);
+
+        $this->assertEquals([], $mapper->getFields(null));
 
     }
 
