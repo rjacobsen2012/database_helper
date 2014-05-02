@@ -1,6 +1,6 @@
 {
-    "name": "database/helper",
-    "description": "Helper package to assist in the creation of files by blacksmith.",
+    "name": "indatus/field-dresser",
+    "description": "Parses either a database table or an eloquent model and returns the fields with their properties.",
     "keywords":["database"],
     "homepage": "http://indatus.com/",
     "license": "MIT",
