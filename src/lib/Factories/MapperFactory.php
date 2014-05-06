@@ -1,5 +1,6 @@
 <?php namespace Factories;
 
+use Contracts\ModelLoaderInterface;
 use Helpers\ConfigHelper;
 use Helpers\LaravelHelper;
 use Helpers\MysqlHelper;
@@ -16,7 +17,7 @@ class MapperFactory
 
     public $name;
 
-    public $repository;
+    public $repository = null;
 
     /** @var \Helpers\ConfigHelper $dbconfig */
     public $dbconfig;
@@ -27,8 +28,17 @@ class MapperFactory
 
     public $repositoryConnection;
 
+    protected $error = null;
+
+    /** @var \Contracts\ModelLoaderInterface null */
+    protected $modelLoader = null;
+
     public $repositories = [
         'mysql'
+    ];
+
+    public $frameworks = [
+        'laravel'
     ];
 
     public function __construct($name, ConfigHelper $dbconfig = null)
@@ -36,7 +46,18 @@ class MapperFactory
 
         $this->name = $name;
         $this->dbconfig = $dbconfig;
+        $this->setModelLoader(new ModelLoader());
 
+    }
+
+    public function setModelLoader(ModelLoaderInterface $modelLoader)
+    {
+        $this->modelLoader = $modelLoader;
+    }
+
+    public function getModelLoader()
+    {
+        return $this->modelLoader;
     }
 
     public function setRepository()
@@ -50,34 +71,53 @@ class MapperFactory
 
     }
 
+    public function getRepository()
+    {
+
+        return $this->repository;
+
+    }
+
     public function build()
     {
 
-        if ($this->isLaravel()) {
+        $framework = $this->checkFrameworks();
 
-            return new LaravelService(
-                $this->model,
-                new LaravelHelper()
-            );
+        if ($framework) {
 
-        } else {
+            switch ($framework) {
 
-            $this->setRepository();
+                case "laravel":
 
-            if ($this->isValidRepository()) {
+                    return new LaravelService(
+                        $this->model,
+                        new LaravelHelper()
+                    );
 
-                return $this->getDatabaseService();
+                    break;
 
             }
 
         }
+
+        $this->setRepository();
+
+        if ($this->isValidRepository()) {
+
+            return $this->getDatabaseService();
+
+        }
+
+        $this->error = "The mapper was not able to find a valid model or database to get fields from.";
+
+        return false;
 
     }
 
     public function getDatabaseService()
     {
 
-        switch ($this->repository) {
+        switch ($this->getRepository()) {
 
             case 'mysql':
 
@@ -100,7 +140,7 @@ class MapperFactory
     public function isValidRepository()
     {
 
-        if ($this->repository && in_array($this->repository, $this->repositories)) {
+        if ($this->getRepository() && in_array($this->getRepository(), $this->repositories)) {
 
             return true;
 
@@ -115,8 +155,7 @@ class MapperFactory
 
         if ($this->name) {
 
-            $model = new ModelLoader();
-            $loadedModel = $model->loadModel($this->name);
+            $loadedModel = $this->getModelLoader()->loadModel($this->name);
 
             if ($loadedModel && $loadedModel instanceof Model) {
 
@@ -127,8 +166,53 @@ class MapperFactory
 
         }
 
+        $this->error = "The field mapper was not able to load the model.";
         return false;
 
+    }
+
+    public function isValidModel()
+    {
+        return $this->checkFrameworks();
+    }
+
+    public function checkFrameworks()
+    {
+        foreach ($this->frameworks as $framework) {
+
+            if ($this->checkFramework($framework)) {
+
+                return $framework;
+
+            }
+
+        }
+
+        $this->error = "The field mapper does not recognize the model framework.";
+        return false;
+    }
+
+    public function checkFramework($framework)
+    {
+        switch ($framework) {
+
+            case "laravel":
+
+                return $this->isLaravel();
+
+                break;
+
+            default:
+
+                $this->error = "The field mapper does not recognize the model framework.";
+                return false;
+
+        }
+    }
+
+    public function getError()
+    {
+        return $this->error;
     }
 
 }

@@ -33,4 +33,13 @@ class StringHelperTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testExplodeString()
+    {
+
+        $testString = "/www/folder/User";
+        $exploded = StringHelper::explodeString($testString, "/");
+        $this->assertEquals(['','www','folder','User'], $exploded);
+
+    }
+
 }

@@ -26,4 +26,11 @@ class StringHelper
 
     }
 
+    public static function explodeString($string, $delimiter)
+    {
+
+        return explode($delimiter, $string);
+
+    }
+
 }

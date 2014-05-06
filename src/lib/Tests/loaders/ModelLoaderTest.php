@@ -17,6 +17,13 @@ class ModelLoaderTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testLoadModelWithPath()
+    {
+        $helper = $this->loader->loadModel('/www/field-dresser/src/lib/Mapper');
+        $this->assertTrue($helper instanceof \Mapper);
+
+    }
+
     public function testLoadModelPasses()
     {
         $helper = $this->loader->loadModel('Mapper');
@@ -32,11 +39,23 @@ class ModelLoaderTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testCheckIfModelExistsLocally()
+    public function testGetModelNameWithPath()
     {
 
-//        $this->loader->loadModel('Mapper');
-//        $this->assertFalse($this->loader->checkIfModelExistsLocally());
+        $this->assertEquals(
+            'Mapper',
+            $this->loader->getModelNameFromPath('/www/field-dresser/src/lib/Mapper')
+        );
+
+    }
+
+    public function testGetModelNameWithoutPath()
+    {
+
+        $this->assertEquals(
+            'Mapper',
+            $this->loader->getModelNameFromPath('Mapper')
+        );
 
     }
 

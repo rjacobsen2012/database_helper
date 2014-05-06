@@ -2,6 +2,7 @@
 
 use Factories\MapperFactory;
 use Helpers\ConfigHelper;
+use Handlers\ResponseHandler;
 
 class Mapper
 {
@@ -9,6 +10,24 @@ class Mapper
     public $dbconfig;
 
     public $mapper;
+
+    /** @var \Handlers\ResponseHandler null */
+    protected $responseHandler = null;
+
+    public function __construct()
+    {
+        $this->setResponseHandler(new ResponseHandler());
+    }
+
+    public function setResponseHandler(ResponseHandler $responseHandler)
+    {
+        $this->responseHandler = $responseHandler;
+    }
+
+    public function getResponseHandler()
+    {
+        return $this->responseHandler;
+    }
 
     /**
      * @param      $type
@@ -47,8 +66,46 @@ class Mapper
         $mapperFactory = $this->getMapperFactory();
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
-        return $mapper->testDbConnectionFails();
 
+        if (!$mapper) {
+            if ($mapperFactory->getError()) {
+                $this->responseHandler->setError($mapperFactory->getError());
+            } else {
+                $this->responseHandler->setError(
+                    "An unknown error occured while trying to test the database connection."
+                );
+            }
+        } else {
+            $this->responseHandler->setSuccess(true);
+
+            $this->responseHandler->setResult($mapper->testDbConnectionFails());
+        }
+
+
+        return $this->responseHandler;
+
+    }
+
+    public function testModel($model)
+    {
+
+        /** @var \Factories\MapperFactory $mapperFactory */
+        $mapperFactory = $this->getMapperFactory($model);
+        if (! $mapperFactory->isValidModel()) {
+            $this->responseHandler->setSuccess(false);
+
+            if ($mapperFactory->getError()) {
+                $this->responseHandler->setError($mapperFactory->getError());
+            } else {
+                $this->responseHandler->setError(
+                    "An unknown error occured while trying to load the model."
+                );
+            }
+        } else {
+            $this->responseHandler->setSuccess(true);
+        }
+
+        return $this->responseHandler;
     }
 
     public function getFields($name)
@@ -58,8 +115,24 @@ class Mapper
         $mapperFactory = $this->getMapperFactory($name);
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
-        $mapper->setDefaults();
-        return $mapper->getTableProperties();
+
+        if (!$mapper) {
+            if ($mapperFactory->getError()) {
+                $this->responseHandler->setError($mapperFactory->getError());
+            } else {
+                $this->responseHandler->setError(
+                    "An unknown error occured while trying to retrieve the fields."
+                );
+            }
+        } else {
+            $this->responseHandler->setSuccess(true);
+
+            $mapper->setDefaults();
+            $this->responseHandler->setResult($mapper->getTableProperties());
+        }
+
+
+        return $this->responseHandler;
 
     }
 
@@ -70,7 +143,24 @@ class Mapper
         $mapperFactory = $this->getMapperFactory($name);
         /** @var \Contracts\ServicesInterface $mapper */
         $mapper = $mapperFactory->build();
-        return $mapper->getModelTableInfo();
+
+        if (!$mapper) {
+            if ($mapperFactory->getError()) {
+                $this->responseHandler->setError($mapperFactory->getError());
+            } else {
+                $this->responseHandler->setError(
+                    "An unknown error occured while trying to retrieve the model or database info."
+                );
+            }
+        } else {
+            $this->responseHandler->setSuccess(true);
+
+            $mapper->setDefaults();
+            $this->responseHandler->setResult($mapper->getModelTableInfo());
+        }
+
+
+        return $this->responseHandler;
 
     }
 

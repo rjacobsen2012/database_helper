@@ -2,6 +2,7 @@
 
 use Drivers\Database\DatabaseService;
 use Factories\MapperFactory;
+use Handlers\ResponseHandler;
 use Helpers\ConfigHelper;
 use Helpers\MysqlHelper;
 use \Mockery;
@@ -44,82 +45,68 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testTestDbConnection()
+    public function testGetMapperFactory()
     {
 
-        $config = new ConfigHelper();
+        $mapper = new \Mapper();
+        $mapperFactory = $mapper->getMapperFactory('User');
+        $this->assertTrue($mapperFactory instanceof MapperFactory);
+
+    }
+
+    public function testTestDbConnectionFailedWithError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
+        );
 
         $mapper = $this->getMock(
             '\Mapper',
-            ['getMapperFactory', 'build']
-        );
-
-        $mapperFactory = $this->getMock(
-            '\Factories\MapperFactory',
-            ['build'],
-            [
-                null,
-                $config
-            ]
+            ['getMapperFactory']
         );
 
         $mapper->expects($this->any())
             ->method('getMapperFactory')
             ->withAnyParameters()
             ->willReturn($mapperFactory);
-
-        $mysqli = Mockery::mock('\mysqli');
-
-        $mysqlRepo = Mockery::mock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            [
-                $mysqli,
-                $config,
-                new MysqlHelper()
-            ]
-        );
-
-        $databaseService = $this->getMock(
-            '\Drivers\Database\DatabaseService',
-            ['testDbConnectionFails'],
-            [
-                null,
-                new MysqlHelper(),
-                $mysqlRepo
-            ]
-        );
-
-        $databaseService->expects($this->any())
-            ->method('testDbConnectionFails')
-            ->withAnyParameters()
-            ->willReturn(true);
 
         $mapperFactory->expects($this->any())
             ->method('build')
             ->withAnyParameters()
-            ->willReturn($databaseService);
+            ->willReturn(false);
 
-        $this->assertTrue($mapper->testDbConnection());
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn('some error');
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testDbConnection();
+        $this->assertEquals('some error', $result->getError());
 
     }
 
-    public function testGetFields()
+    public function testTestDbConnectionFailedWithNoError()
     {
 
-        $config = new ConfigHelper();
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
+        );
 
         $mapper = $this->getMock(
             '\Mapper',
-            ['getMapperFactory', 'build']
-        );
-
-        $mapperFactory = $this->getMock(
-            '\Factories\MapperFactory',
-            ['build'],
-            [
-                null,
-                $config
-            ]
+            ['getMapperFactory']
         );
 
         $mapper->expects($this->any())
@@ -127,62 +114,437 @@ class MapperTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn($mapperFactory);
 
-        $mysqli = Mockery::mock('\mysqli');
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn(false);
 
-        $mysqlRepo = Mockery::mock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            [
-                $mysqli,
-                $config,
-                new MysqlHelper()
-            ]
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testDbConnection('User');
+        $this->assertEquals(
+            'An unknown error occured while trying to test the database connection.',
+            $result->getError()
         );
 
-        $databaseService = $this->getMock(
-            '\Drivers\Database\DatabaseService',
-            ['setDefaults', 'getTableProperties'],
-            [
-                null,
-                new MysqlHelper(),
-                $mysqlRepo
-            ]
+    }
+
+    public function testTestDbConnectionSucceeded()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'setDefaults', 'testDbConnectionFails'],
+            ['User']
         );
 
-        $databaseService->expects($this->any())
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
             ->method('setDefaults')
             ->withAnyParameters()
-            ->willReturn($databaseService);
+            ->willReturn($mapperFactory);
 
-        $databaseService->expects($this->any())
+        $mapperFactory->expects($this->any())
+            ->method('testDbConnectionFails')
+            ->withAnyParameters()
+            ->willReturn([]);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testDbConnection('User');
+        $this->assertTrue($result->getSuccess());
+
+        $this->assertEquals([], $result->getResult());
+
+    }
+
+    public function testTestModelFailedWithError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['isValidModel', 'getError'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('isValidModel')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn('some error');
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testModel('User');
+        $this->assertEquals('some error', $result->getError());
+
+    }
+
+    public function testTestModelFailedWithNoError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['isValidModel', 'getError'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('isValidModel')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testModel('User');
+        $this->assertEquals(
+            'An unknown error occured while trying to load the model.',
+            $result->getError()
+        );
+
+    }
+
+    public function testTestModelSucceeded()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['isValidModel', 'setDefaults', 'getTableProperties'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('isValidModel')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->testModel('User');
+        $this->assertTrue($result->getSuccess());
+
+    }
+
+    public function testGetFieldsFailedWithError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn('some error');
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getFields('User');
+        $this->assertEquals('some error', $result->getError());
+
+    }
+
+    public function testGetFieldsFailedWithNoError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getFields('User');
+        $this->assertEquals(
+            'An unknown error occured while trying to retrieve the fields.',
+            $result->getError()
+        );
+
+    }
+
+    public function testGetFieldsSucceeded()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'setDefaults', 'getTableProperties'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('setDefaults')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
             ->method('getTableProperties')
             ->withAnyParameters()
             ->willReturn([]);
 
-        $mapperFactory->expects($this->any())
-            ->method('build')
-            ->withAnyParameters()
-            ->willReturn($databaseService);
-
-        $this->assertEquals([], $mapper->getFields(null));
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getFields('User');
+        $this->assertTrue($result->getSuccess());
+        $this->assertEquals([], $result->getResult());
 
     }
 
-    public function testGetInfo()
+    public function testGetInfoFailedWithError()
     {
 
-        $mapper = new \Mapper();
-        $mapper->setDbConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
         );
 
-        $info = $mapper->getInfo('User');
-        $this->assertEquals(['properties' => null], $info);
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn('some error');
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getInfo('User');
+        $this->assertEquals('some error', $result->getError());
+
+    }
+
+    public function testGetInfoFailedWithNoError()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'getError'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $mapperFactory->expects($this->any())
+            ->method('getError')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getInfo('User');
+        $this->assertEquals(
+            'An unknown error occured while trying to retrieve the model or database info.',
+            $result->getError()
+        );
+
+    }
+
+    public function testGetInfoSucceeded()
+    {
+
+        $responseHandler = new ResponseHandler();
+
+        $mapperFactory = $this->getMock(
+            'Factories\MapperFactory',
+            ['build', 'setDefaults', 'getModelTableInfo'],
+            ['User']
+        );
+
+        $mapper = $this->getMock(
+            '\Mapper',
+            ['getMapperFactory']
+        );
+
+        $mapper->expects($this->any())
+            ->method('getMapperFactory')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('build')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('setDefaults')
+            ->withAnyParameters()
+            ->willReturn($mapperFactory);
+
+        $mapperFactory->expects($this->any())
+            ->method('getModelTableInfo')
+            ->withAnyParameters()
+            ->willReturn([]);
+
+        $mapper->setResponseHandler($responseHandler);
+        $setResponseHandler = $mapper->getResponseHandler();
+        $this->assertTrue($setResponseHandler instanceof ResponseHandler);
+        $result = $mapper->getInfo('User');
+        $this->assertTrue($result->getSuccess());
+        $this->assertEquals([], $result->getResult());
 
     }
 
