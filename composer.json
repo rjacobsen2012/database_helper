@@ -14,7 +14,7 @@
     ],
     "autoload": {
         "classmap": [
-            "src/lib"
+            "src"
         ]
     },
     "require": {

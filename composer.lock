@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6a1f234c092c7b47c4ca83a563b79d3e",
+    "hash": "8ae284b5922d3518d8b90c138e2ddde6",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -42,7 +42,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan Wage",
+                    "name": "Jonathan H. Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -61,7 +61,7 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes Schmitt",
+                    "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
@@ -84,12 +84,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "bc5eb13f31b27aaa9f8b93f94d44a33df7edf907"
+                "reference": "1523006ab93b71e46443cb7afeff5032fb6d54c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/bc5eb13f31b27aaa9f8b93f94d44a33df7edf907",
-                "reference": "bc5eb13f31b27aaa9f8b93f94d44a33df7edf907",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/1523006ab93b71e46443cb7afeff5032fb6d54c6",
+                "reference": "1523006ab93b71e46443cb7afeff5032fb6d54c6",
                 "shasum": ""
             },
             "require": {
@@ -124,10 +124,10 @@
                     "name": "Taylor Otwell",
                     "email": "taylorotwell@gmail.com",
                     "homepage": "https://github.com/taylorotwell",
-                    "role": "Developer"
+                    "role": "Creator of Laravel"
                 }
             ],
-            "time": "2014-04-19 00:19:10"
+            "time": "2014-05-02 18:14:03"
         }
     ],
     "packages-dev": [
@@ -170,7 +170,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan Wage",
+                    "name": "Jonathan H. Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -189,9 +189,9 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes Schmitt",
+                    "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "https://github.com/schmittjoh",
+                    "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -284,12 +284,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/collections.git",
-                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2"
+                "reference": "97475b2761f22cd9817c135283ad1079543a4586"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/collections/zipball/b99c5c46c87126201899afe88ec490a25eedd6a2",
-                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/97475b2761f22cd9817c135283ad1079543a4586",
+                "reference": "97475b2761f22cd9817c135283ad1079543a4586",
                 "shasum": ""
             },
             "require": {
@@ -344,7 +344,7 @@
                 "collections",
                 "iterator"
             ],
-            "time": "2014-02-03 23:07:43"
+            "time": "2014-05-07 01:20:20"
         },
         {
             "name": "doctrine/common",
@@ -427,12 +427,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "d2f081de8384f7b1a2031efd82fe7256bbb6d465"
+                "reference": "321e496350c55b326940ffde86f4c9efb87f8736"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/d2f081de8384f7b1a2031efd82fe7256bbb6d465",
-                "reference": "d2f081de8384f7b1a2031efd82fe7256bbb6d465",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/321e496350c55b326940ffde86f4c9efb87f8736",
+                "reference": "321e496350c55b326940ffde86f4c9efb87f8736",
                 "shasum": ""
             },
             "require": {
@@ -440,7 +440,7 @@
                 "php": ">=5.3.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
+                "phpunit/phpunit": "4.0.*",
                 "symfony/console": "2.*"
             },
             "suggest": {
@@ -490,7 +490,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2014-04-29 22:45:42"
+            "time": "2014-05-05 19:57:41"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -722,12 +722,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/container.git",
-                "reference": "2fbb91de578298c9ca249248c7c9de2e82ee073e"
+                "reference": "0c40e48f7fe4d22060b6953e90434c8e453a4d2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/container/zipball/2fbb91de578298c9ca249248c7c9de2e82ee073e",
-                "reference": "2fbb91de578298c9ca249248c7c9de2e82ee073e",
+                "url": "https://api.github.com/repos/illuminate/container/zipball/0c40e48f7fe4d22060b6953e90434c8e453a4d2f",
+                "reference": "0c40e48f7fe4d22060b6953e90434c8e453a4d2f",
                 "shasum": ""
             },
             "require": {
@@ -756,10 +756,10 @@
                     "name": "Taylor Otwell",
                     "email": "taylorotwell@gmail.com",
                     "homepage": "https://github.com/taylorotwell",
-                    "role": "Developer"
+                    "role": "Creator of Laravel"
                 }
             ],
-            "time": "2014-04-18 21:33:49"
+            "time": "2014-05-02 21:28:33"
         },
         {
             "name": "illuminate/database",
@@ -768,12 +768,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/database.git",
-                "reference": "27a5939f8e04031026559d846155dbfabe0264dd"
+                "reference": "7bd28b6d41868ef2ef724449be7a1a12e6d20c64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/database/zipball/27a5939f8e04031026559d846155dbfabe0264dd",
-                "reference": "27a5939f8e04031026559d846155dbfabe0264dd",
+                "url": "https://api.github.com/repos/illuminate/database/zipball/7bd28b6d41868ef2ef724449be7a1a12e6d20c64",
+                "reference": "7bd28b6d41868ef2ef724449be7a1a12e6d20c64",
                 "shasum": ""
             },
             "require": {
@@ -812,7 +812,7 @@
                     "name": "Taylor Otwell",
                     "email": "taylorotwell@gmail.com",
                     "homepage": "https://github.com/taylorotwell",
-                    "role": "Developer"
+                    "role": "Creator of Laravel"
                 }
             ],
             "keywords": [
@@ -821,7 +821,7 @@
                 "orm",
                 "sql"
             ],
-            "time": "2014-04-19 00:19:10"
+            "time": "2014-05-02 20:21:39"
         },
         {
             "name": "illuminate/events",
@@ -867,7 +867,7 @@
                     "name": "Taylor Otwell",
                     "email": "taylorotwell@gmail.com",
                     "homepage": "https://github.com/taylorotwell",
-                    "role": "Developer"
+                    "role": "Creator of Laravel"
                 }
             ],
             "time": "2014-03-20 19:38:32"
@@ -915,7 +915,7 @@
                     "name": "Taylor Otwell",
                     "email": "taylorotwell@gmail.com",
                     "homepage": "https://github.com/taylorotwell",
-                    "role": "Developer"
+                    "role": "Creator of Laravel"
                 }
             ],
             "time": "2014-04-08 20:49:08"
@@ -976,12 +976,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/padraic/mockery.git",
-                "reference": "09cad223615eac9e229837c9d44792f393529328"
+                "reference": "715721895260a951d9cb9c2b9269d5333fb37a5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/09cad223615eac9e229837c9d44792f393529328",
-                "reference": "09cad223615eac9e229837c9d44792f393529328",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/715721895260a951d9cb9c2b9269d5333fb37a5e",
+                "reference": "715721895260a951d9cb9c2b9269d5333fb37a5e",
                 "shasum": ""
             },
             "require": {
@@ -1034,7 +1034,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2014-04-25 09:53:30"
+            "time": "2014-05-02 12:25:43"
         },
         {
             "name": "nesbot/carbon",
@@ -1336,12 +1336,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1dbd75bfb8de536c2e4906dd3841b5cabe1e95f6"
+                "reference": "f284576f0345dffe3c25330be481c6240f5aa641"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1dbd75bfb8de536c2e4906dd3841b5cabe1e95f6",
-                "reference": "1dbd75bfb8de536c2e4906dd3841b5cabe1e95f6",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f284576f0345dffe3c25330be481c6240f5aa641",
+                "reference": "f284576f0345dffe3c25330be481c6240f5aa641",
                 "shasum": ""
             },
             "require": {
@@ -1402,7 +1402,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-30 13:01:14"
+            "time": "2014-05-05 06:17:41"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1410,12 +1410,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "f0e9f6dcefc1739e716b75a77c3c4107033fa134"
+                "reference": "bbc1aa16d02273790a2106e3385cc0efeb6a18cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/f0e9f6dcefc1739e716b75a77c3c4107033fa134",
-                "reference": "f0e9f6dcefc1739e716b75a77c3c4107033fa134",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/bbc1aa16d02273790a2106e3385cc0efeb6a18cb",
+                "reference": "bbc1aa16d02273790a2106e3385cc0efeb6a18cb",
                 "shasum": ""
             },
             "require": {
@@ -1459,7 +1459,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2014-04-27 07:24:57"
+            "time": "2014-05-04 09:39:30"
         },
         {
             "name": "psr/log",
@@ -1510,12 +1510,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "7043b47ba5990b6b12ee32625934d7a9be3a8ab2"
+                "reference": "9acfeaa92132325252efd9e973cd47e157d4c773"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/7043b47ba5990b6b12ee32625934d7a9be3a8ab2",
-                "reference": "7043b47ba5990b6b12ee32625934d7a9be3a8ab2",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/9acfeaa92132325252efd9e973cd47e157d4c773",
+                "reference": "9acfeaa92132325252efd9e973cd47e157d4c773",
                 "shasum": ""
             },
             "require": {
@@ -1524,7 +1524,7 @@
                 "sebastian/exporter": "~1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "~4.1"
             },
             "type": "library",
             "extra": {
@@ -1567,7 +1567,7 @@
                 "compare",
                 "equality"
             ],
-            "time": "2014-04-30 06:50:25"
+            "time": "2014-05-04 09:14:18"
         },
         {
             "name": "sebastian/diff",
@@ -1575,12 +1575,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "ecc923996545d4e4395c0759b6c538f085233f62"
+                "reference": "10a9cd901c6878378482b0191618faf50e701732"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/ecc923996545d4e4395c0759b6c538f085233f62",
-                "reference": "ecc923996545d4e4395c0759b6c538f085233f62",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/10a9cd901c6878378482b0191618faf50e701732",
+                "reference": "10a9cd901c6878378482b0191618faf50e701732",
                 "shasum": ""
             },
             "require": {
@@ -1617,7 +1617,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2014-02-16 12:08:10"
+            "time": "2014-05-07 06:57:00"
         },
         {
             "name": "sebastian/environment",
@@ -1625,19 +1625,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "87c45ac84fd568336a6432da4878624795cad97d"
+                "reference": "10c7467da0622f7848cc5cadc0828c3359254df4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/87c45ac84fd568336a6432da4878624795cad97d",
-                "reference": "87c45ac84fd568336a6432da4878624795cad97d",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/10c7467da0622f7848cc5cadc0828c3359254df4",
+                "reference": "10c7467da0622f7848cc5cadc0828c3359254df4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.0.*@dev"
+                "phpunit/phpunit": "~4.0"
             },
             "type": "library",
             "extra": {
@@ -1668,7 +1668,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2014-04-27 07:18:42"
+            "time": "2014-05-04 17:56:05"
         },
         {
             "name": "sebastian/exporter",
@@ -1676,12 +1676,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "9a62fed6743f762aee4eb90a7b95c2aaf7b6c117"
+                "reference": "eb54a69388e5b7ea48561a65588f067fdda0c886"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/9a62fed6743f762aee4eb90a7b95c2aaf7b6c117",
-                "reference": "9a62fed6743f762aee4eb90a7b95c2aaf7b6c117",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/eb54a69388e5b7ea48561a65588f067fdda0c886",
+                "reference": "eb54a69388e5b7ea48561a65588f067fdda0c886",
                 "shasum": ""
             },
             "require": {
@@ -1734,7 +1734,7 @@
                 "export",
                 "exporter"
             ],
-            "time": "2014-04-27 07:18:52"
+            "time": "2014-05-05 08:31:02"
         },
         {
             "name": "sebastian/version",
@@ -2170,12 +2170,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/FrameworkBundle.git",
-                "reference": "b21853cb892cea2a7986c4995ad3a41594d15b68"
+                "reference": "0f033b641090fb5ddbf51ef3faf7f6f8f0e3d9fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/FrameworkBundle/zipball/b21853cb892cea2a7986c4995ad3a41594d15b68",
-                "reference": "b21853cb892cea2a7986c4995ad3a41594d15b68",
+                "url": "https://api.github.com/repos/symfony/FrameworkBundle/zipball/0f033b641090fb5ddbf51ef3faf7f6f8f0e3d9fb",
+                "reference": "0f033b641090fb5ddbf51ef3faf7f6f8f0e3d9fb",
                 "shasum": ""
             },
             "require": {
@@ -2237,7 +2237,7 @@
             ],
             "description": "Symfony FrameworkBundle",
             "homepage": "http://symfony.com",
-            "time": "2014-04-25 11:40:15"
+            "time": "2014-05-04 16:56:58"
         },
         {
             "name": "symfony/http-foundation",
@@ -2736,12 +2736,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Translation.git",
-                "reference": "d456c7b7510b6510d27b5addd0bfbf1f83c70d8d"
+                "reference": "254931b0bce3c70f6f1d58a403873c2628260a5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Translation/zipball/d456c7b7510b6510d27b5addd0bfbf1f83c70d8d",
-                "reference": "d456c7b7510b6510d27b5addd0bfbf1f83c70d8d",
+                "url": "https://api.github.com/repos/symfony/Translation/zipball/254931b0bce3c70f6f1d58a403873c2628260a5b",
+                "reference": "254931b0bce3c70f6f1d58a403873c2628260a5b",
                 "shasum": ""
             },
             "require": {
@@ -2784,7 +2784,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "http://symfony.com",
-            "time": "2014-04-18 21:02:40"
+            "time": "2014-05-04 16:56:58"
         },
         {
             "name": "symfony/yaml",

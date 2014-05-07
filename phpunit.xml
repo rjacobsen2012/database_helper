@@ -11,21 +11,20 @@
 >
     <testsuites>
         <testsuite name="Mapper">
-            <directory>./src/lib/Tests</directory>
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <blacklist>
             <directory>./vendor</directory>
-            <directory>./src/lib/Tests</directory>
-            <directory>./src/lib/Contracts</directory>
+            <directory>./tests</directory>
+            <directory>./src/Contracts</directory>
         </blacklist>
         <whitelist>
-            <directory>./src/lib</directory>
+            <directory>./src</directory>
             <exclude>
-                <directory>./src/lib/Tests</directory>
-                <directory>./src/lib/Contracts</directory>
+                <directory>./src/Contracts</directory>
             </exclude>
         </whitelist>
     </filter>
