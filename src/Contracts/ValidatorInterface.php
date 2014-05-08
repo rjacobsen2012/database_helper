@@ -1,8 +1,19 @@
 <?php namespace Contracts;
 
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 
+/**
+ * Interface ValidatorInterface
+ *
+ * @package Contracts
+ */
 interface ValidatorInterface
 {
-    public function validate($model, ConfigHelper $config = null);
+    /**
+     * @param                $model
+     * @param DatabaseConfig $config
+     *
+     * @return mixed
+     */
+    public function validate($model, DatabaseConfig $config = null);
 }

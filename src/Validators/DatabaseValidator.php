@@ -3,112 +3,79 @@
 use Contracts\ValidatorInterface;
 use Drivers\Database\DatabaseService;
 use Drivers\Database\Mysql\MysqlRepository;
-use Helpers\ConfigHelper;
-use Helpers\DatabaseHelper;
-use Helpers\MysqlHelper;
+use Drivers\Database\DatabaseConfig;
+use Helpers\ServiceHelper;
 
+/**
+ * Class DatabaseValidator
+ *
+ * @package Validators
+ */
 class DatabaseValidator implements ValidatorInterface
 {
-
-    protected $model = null;
-
-    protected $repository = null;
-
-    protected $repositories = [
+    /**
+     * @var array
+     */
+    protected $validRepositories = [
         'mysql'
     ];
 
-    protected $connection = null;
-
-    /** @var \Helpers\ConfigHelper */
-    protected $config = null;
-
-    public function validate($model, ConfigHelper $config = null)
+    /**
+     * @param                $model
+     * @param DatabaseConfig $config
+     *
+     * @return mixed
+     */
+    public function validate($model, DatabaseConfig $config = null)
     {
-        $this->model = $model;
-        $this->config = $config;
-        $this->setRepository();
-        return $this->checkRepositories();
-    }
+        if ($this->isValidRepository($config->getType())) {
 
-    public function checkRepositories()
-    {
+            switch ($config->getType()) {
 
-        foreach ($this->repositories as $repository) {
+                case "mysql":
 
-            if ($this->checkRepository($repository)) {
+                    return $this->getMysql($model, $config);
 
-                if ($this->connection) {
-
-                    return $this->connection;
-
-                }
+                    break;
 
             }
 
         }
 
-        return false;
+        return null;
 
     }
 
-    public function checkRepository($repository)
+    /**
+     * @param $type
+     *
+     * @return bool
+     */
+    public function isValidRepository($type)
     {
 
-        switch ($repository) {
-
-            case 'mysql':
-
-                $this->connection = $this->isMysql();
-
-                return $this->connection;
-
-                break;
-
-            default:
-
-                return false;
-
-        }
+        return in_array($type, $this->validRepositories);
 
     }
 
-    public function isMysql()
+    /**
+     * @param $model
+     * @param $config
+     *
+     * @return DatabaseService
+     */
+    public function getMysql($model, $config)
     {
 
-        if ($this->config->getType() == 'mysql') {
-
-            return new DatabaseService(
-                $this->model,
-                new DatabaseHelper(),
-                new MysqlRepository(
-                    new \mysqli(),
-                    $this->config,
-                    new MysqlHelper()
-                )
-            );
-
-        }
-
-        return false;
-
-    }
-
-    public function setRepository()
-    {
-
-        if (!is_null($this->config)) {
-
-            $this->repository = $this->config->getType();
-
-        }
-
-    }
-
-    public function getRepository()
-    {
-
-        return $this->repository;
+        return new DatabaseService(
+            $model,
+            new ServiceHelper(),
+            new MysqlRepository(
+                new \mysqli(),
+                $config,
+                new ServiceHelper()
+            )
+        );
 
     }
 

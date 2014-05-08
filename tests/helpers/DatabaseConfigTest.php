@@ -1,18 +1,19 @@
 <?php namespace helpers;
 
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 use \Mockery;
 
-class ConfigHelperTest extends \PHPUnit_Framework_TestCase
+class DatabaseConfigTest extends \PHPUnit_Framework_TestCase
 {
 
+    /** @var \Drivers\Database\DatabaseConfig */
     protected $helper;
 
     public function setUp()
     {
 
         parent::setUp();
-        $this->helper = new ConfigHelper();
+        $this->helper = new DatabaseConfig();
 
     }
 
@@ -144,7 +145,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     protected function setGetFails($set, $message)
     {
 
-        $mock = $this->getMock('ConfigHelper', [$set]);
+        $mock = $this->getMock('Drivers\Database\DatabaseConfig', [$set]);
         $exception = new \Exception($message);
         $mock->expects($this->any())
             ->method($set)

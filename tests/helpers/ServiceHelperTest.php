@@ -1,8 +1,8 @@
 <?php namespace helpers;
 
-use Helpers\MysqlHelper;
+use Helpers\ServiceHelper;
 
-class MysqlHelperTest extends \PHPUnit_Framework_TestCase
+class ServiceHelperTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $helper;
@@ -11,7 +11,7 @@ class MysqlHelperTest extends \PHPUnit_Framework_TestCase
     {
 
         parent::setUp();
-        $this->helper = new MysqlHelper();
+        $this->helper = new ServiceHelper();
 
     }
 

@@ -3,23 +3,43 @@
 use Contracts\ModelLoaderInterface;
 use Contracts\ValidatorInterface;
 use Drivers\Laravel\LaravelService;
-use Helpers\ConfigHelper;
-use Helpers\LaravelHelper;
+use Drivers\Database\DatabaseConfig;
+use Helpers\ServiceHelper;
 use Illuminate\Database\Eloquent\Model;
 use Loaders\ModelLoader;
 
+/**
+ * Class ModelValidator
+ *
+ * @package Validators
+ */
 class ModelValidator implements ValidatorInterface
 {
 
+    /**
+     * @var null
+     */
     protected $modelLoader = null;
 
+    /**
+     * @var array
+     */
     protected $frameworks = [
         'laravel'
     ];
 
+    /**
+     * @var mixed
+     */
     protected $model;
 
-    public function validate($model, ConfigHelper $config = null)
+    /**
+     * @param                $model
+     * @param DatabaseConfig $config
+     *
+     * @return mixed
+     */
+    public function validate($model, DatabaseConfig $config = null)
     {
         $this->setModelLoader(new ModelLoader());
         $this->model = $this->getModelLoader()->loadModel($model);
@@ -27,16 +47,25 @@ class ModelValidator implements ValidatorInterface
         return $this->checkFrameworks();
     }
 
+    /**
+     * @param ModelLoaderInterface $modelLoader
+     */
     public function setModelLoader(ModelLoaderInterface $modelLoader)
     {
         $this->modelLoader = $modelLoader;
     }
 
+    /**
+     * @return \Loaders\ModelLoader
+     */
     public function getModelLoader()
     {
         return $this->modelLoader;
     }
 
+    /**
+     * @return bool|LaravelService
+     */
     public function checkFrameworks()
     {
         foreach ($this->frameworks as $framework) {
@@ -54,6 +83,11 @@ class ModelValidator implements ValidatorInterface
         return false;
     }
 
+    /**
+     * @param $framework
+     *
+     * @return bool|LaravelService
+     */
     public function checkFramework($framework)
     {
         switch ($framework) {
@@ -71,6 +105,9 @@ class ModelValidator implements ValidatorInterface
         }
     }
 
+    /**
+     * @return bool|LaravelService
+     */
     public function isLaravel()
     {
 
@@ -78,7 +115,7 @@ class ModelValidator implements ValidatorInterface
 
             return new LaravelService(
                 $this->model,
-                new LaravelHelper()
+                new ServiceHelper()
             );
 
         }

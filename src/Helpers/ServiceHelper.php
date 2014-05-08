@@ -2,9 +2,19 @@
 
 use Contracts\HelperInterface;
 
-class DatabaseHelper implements HelperInterface
+/**
+ * Class ServiceHelper
+ *
+ * @package Helpers
+ */
+class ServiceHelper implements HelperInterface
 {
 
+    /**
+     * @param $type
+     *
+     * @return boolean
+     */
     public function isString($type)
     {
 
@@ -25,6 +35,11 @@ class DatabaseHelper implements HelperInterface
 
     }
 
+    /**
+     * @param $type
+     *
+     * @return boolean
+     */
     public function isInteger($type)
     {
 
@@ -41,6 +56,11 @@ class DatabaseHelper implements HelperInterface
 
     }
 
+    /**
+     * @param $type
+     *
+     * @return boolean
+     */
     public function isDecimal($type)
     {
 
@@ -55,6 +75,11 @@ class DatabaseHelper implements HelperInterface
 
     }
 
+    /**
+     * @param $type
+     *
+     * @return boolean
+     */
     public function isBoolean($type)
     {
 
@@ -68,6 +93,11 @@ class DatabaseHelper implements HelperInterface
 
     }
 
+    /**
+     * @param $type
+     *
+     * @return boolean
+     */
     public function isMixed($type)
     {
 
@@ -84,9 +114,7 @@ class DatabaseHelper implements HelperInterface
     /**
      * @param $type
      *
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function filterTableFieldType($type)
     {

@@ -2,22 +2,39 @@
 
 use Contracts\ModelLoaderInterface;
 use Contracts\ValidatorInterface;
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 use Validators\DatabaseValidator;
 use Validators\ModelValidator;
 
+/**
+ * Class MapperFactory
+ *
+ * @package Factories
+ */
 class MapperFactory
 {
 
+    /**
+     * @var string
+     */
     protected $name;
 
-    /** @var \Helpers\ConfigHelper $dbconfig */
+    /** @var \Drivers\Database\DatabaseConfig $dbconfig */
     protected $dbconfig;
 
+    /**
+     * @var mixed
+     */
     protected $model;
 
+    /**
+     * @var mixed
+     */
     protected $connection;
 
+    /**
+     * @var string
+     */
     protected $error = null;
 
     /** @var \Contracts\ValidatorInterface $modelValidator */
@@ -26,7 +43,11 @@ class MapperFactory
     /** @var \Contracts\ValidatorInterface $modelValidator */
     protected $databaseValidator = null;
 
-    public function __construct($name, ConfigHelper $dbconfig = null)
+    /**
+     * @param                $name
+     * @param DatabaseConfig $dbconfig
+     */
+    public function __construct($name, DatabaseConfig $dbconfig = null)
     {
 
         $this->name = $name;
@@ -36,26 +57,41 @@ class MapperFactory
 
     }
 
+    /**
+     * @param ValidatorInterface $validator
+     */
     public function setModelValidator(ValidatorInterface $validator)
     {
         $this->modelValidator = $validator;
     }
 
+    /**
+     * @return ValidatorInterface
+     */
     public function getModelValidator()
     {
         return $this->modelValidator;
     }
 
+    /**
+     * @param ValidatorInterface $validator
+     */
     public function setDatabaseValidator(ValidatorInterface $validator)
     {
         $this->databaseValidator = $validator;
     }
 
+    /**
+     * @return ValidatorInterface
+     */
     public function getDatabaseValidator()
     {
         return $this->databaseValidator;
     }
 
+    /**
+     * @return bool|mixed
+     */
     public function build()
     {
 
@@ -75,6 +111,9 @@ class MapperFactory
 
     }
 
+    /**
+     * @return mixed
+     */
     public function isValidRepository()
     {
 
@@ -90,6 +129,9 @@ class MapperFactory
 
     }
 
+    /**
+     * @return mixed
+     */
     public function isValidModel()
     {
 
@@ -105,6 +147,9 @@ class MapperFactory
 
     }
 
+    /**
+     * @return string
+     */
     public function getError()
     {
         return $this->error;

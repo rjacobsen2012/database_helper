@@ -1,6 +1,6 @@
 <?php namespace Drivers\Laravel;
 
-use Helpers\LaravelHelper;
+use Helpers\ServiceHelper;
 use Illuminate\Database\Eloquent\Model;
 use Contracts\ServicesInterface;
 
@@ -46,10 +46,11 @@ class LaravelService implements ServicesInterface
 
     /**
      * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \Helpers\ServiceHelper $helper
      *
      * @access public
      */
-    public function __construct(Model $model, LaravelHelper $helper)
+    public function __construct(Model $model, ServiceHelper $helper)
     {
 
         $this->model = $model;
@@ -57,6 +58,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setDefaults()
     {
 
@@ -67,11 +71,17 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return boolean
+     */
     public function validateDbConnection()
     {
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function setTable()
     {
 
@@ -79,6 +89,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return string
+     */
     public function getTable()
     {
 
@@ -86,6 +99,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setSchema()
     {
 
@@ -93,6 +109,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return string
+     */
     public function getSchema()
     {
 
@@ -100,6 +119,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setColumns()
     {
 
@@ -107,6 +129,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return mixed
+     */
     public function getColumns()
     {
 
@@ -114,6 +139,9 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @return mixed
+     */
     public function getProperties()
     {
 
@@ -128,8 +156,6 @@ class LaravelService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getModelTableInfo()
@@ -141,8 +167,6 @@ class LaravelService implements ServicesInterface
 
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getTableProperties()
@@ -151,7 +175,7 @@ class LaravelService implements ServicesInterface
     }
 
     /**
-     * @access private
+     * @return string
      */
     public function getModelTable()
     {
@@ -171,8 +195,6 @@ class LaravelService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getTableColumns()
@@ -182,8 +204,6 @@ class LaravelService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getModelDates()
@@ -192,11 +212,7 @@ class LaravelService implements ServicesInterface
     }
 
     /**
-     * @param $columns
-     *
-     * @access public
-     *
-     * @return mixed
+     * @return void
      */
     public function filterTableColumns()
     {
@@ -230,9 +246,7 @@ class LaravelService implements ServicesInterface
     /**
      * @param $column
      *
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function getColumnName($column)
     {
@@ -242,9 +256,7 @@ class LaravelService implements ServicesInterface
     /**
      * @param $column
      *
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function getColumnType($column)
     {
@@ -253,13 +265,12 @@ class LaravelService implements ServicesInterface
 
     /**
      * @param      $name
-     * @param null $type
-     * @param null $read
-     * @param null $write
+     * @param string $type
+     * @param boolean $required
+     * @param boolean $read
+     * @param boolean $write
      *
-     * @access public
-     *
-     * @return mixed
+     * @return void
      */
     public function addProperty($name, $type = null, $required = false, $read = false, $write = false)
     {
@@ -272,6 +283,11 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return void
+     */
     public function setProperty($name)
     {
 
@@ -283,6 +299,11 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return string
+     */
     public function getProperty($name)
     {
 
@@ -296,6 +317,12 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param        $name
+     * @param string $type
+     *
+     * @return void
+     */
     public function setPropertyType($name, $type = 'mixed')
     {
 
@@ -309,6 +336,11 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return string
+     */
     public function getPropertyType($name)
     {
 
@@ -322,6 +354,12 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     * @param $read
+     *
+     * @return void
+     */
     public function setPropertyRead($name, $read)
     {
 
@@ -335,7 +373,12 @@ class LaravelService implements ServicesInterface
 
     }
 
-    public function getPropertyRead($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyRead($name)
     {
 
         if (isset($this->properties[$name])) {
@@ -348,6 +391,12 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     * @param $write
+     *
+     * @return void
+     */
     public function setPropertyWrite($name, $write)
     {
 
@@ -361,7 +410,12 @@ class LaravelService implements ServicesInterface
 
     }
 
-    public function getPropertyWrite($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyWrite($name)
     {
 
         if (isset($this->properties[$name])) {
@@ -374,6 +428,12 @@ class LaravelService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     * @param $required
+     *
+     * @return void
+     */
     public function setPropertyRequired($name, $required)
     {
 
@@ -387,7 +447,12 @@ class LaravelService implements ServicesInterface
 
     }
 
-    public function getPropertyRequired($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyRequired($name)
     {
 
         if (isset($this->properties[$name])) {

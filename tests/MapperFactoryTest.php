@@ -4,7 +4,7 @@ use Contracts\ModelLoaderInterface;
 use Drivers\Database\DatabaseService;
 use Drivers\Laravel\LaravelService;
 use Factories\MapperFactory;
-use Helpers\MysqlHelper;
+use Helpers\ServiceHelper;
 use Loaders\ModelLoader;
 use \Mockery;
 
@@ -31,7 +31,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             'socket'
         ];
 
-        $mock = Mockery::mock('Helpers\ConfigHelper');
+        $mock = Mockery::mock('Drivers\Database\DatabaseConfig');
         $mock->shouldReceive('setConfig')->once()->withArgs([
             $args[0],
             $args[1],
@@ -59,7 +59,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             $args[6]
         );
 
-        /** \Helpers\ConfigHelper $config */
+        /** \Drivers\Database\DatabaseConfig $config */
         $config = $mock;
 
         $modelValidator = Mockery::mock('Validators\ModelValidator');
@@ -118,7 +118,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             'socket'
         ];
 
-        $mock = Mockery::mock('Helpers\ConfigHelper');
+        $mock = Mockery::mock('Drivers\Database\DatabaseConfig');
         $mock->shouldReceive('setConfig')->once()->withArgs([
             $args[0],
             $args[1],
@@ -146,7 +146,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             $args[6]
         );
 
-        /** \Helpers\ConfigHelper $config */
+        /** \Drivers\Database\DatabaseConfig $config */
         $config = $mock;
 
         $modelValidator = Mockery::mock('Validators\ModelValidator');
@@ -199,7 +199,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             'socket'
         ];
 
-        $mock = Mockery::mock('Helpers\ConfigHelper');
+        $mock = Mockery::mock('Drivers\Database\DatabaseConfig');
         $mock->shouldReceive('setConfig')->once()->withArgs([
             $args[0],
             $args[1],
@@ -227,7 +227,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             $args[6]
         );
 
-        /** \Helpers\ConfigHelper $config */
+        /** \Drivers\Database\DatabaseConfig $config */
         $config = $mock;
 
         $mapperFactory = new MapperFactory('User', $config);
@@ -249,7 +249,7 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             'socket'
         ];
 
-        $mock = Mockery::mock('Helpers\ConfigHelper');
+        $mock = Mockery::mock('Drivers\Database\DatabaseConfig');
         $mock->shouldReceive('setConfig')->once()->withArgs([
             $args[0],
             $args[1],
@@ -277,12 +277,12 @@ class MapperFactoryTest extends \PHPUnit_Framework_TestCase
             $args[6]
         );
 
-        /** \Helpers\ConfigHelper $config */
+        /** \Drivers\Database\DatabaseConfig $config */
         $config = $mock;
 
         $mapperFactory = new MapperFactory('User', $config);
         $respository = $mapperFactory->isValidRepository();
-        $this->assertFalse($respository);
+        $this->assertNull($respository);
 
     }
 

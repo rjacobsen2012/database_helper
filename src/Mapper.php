@@ -1,14 +1,20 @@
 <?php
 
 use Factories\MapperFactory;
-use Helpers\ConfigHelper;
-use Handlers\ResponseHandler;
+use Drivers\Database\DatabaseConfig;
 
+/**
+ * Class Mapper
+ */
 class Mapper
 {
 
+    /** @var \Drivers\Database\DatabaseConfig */
     public $dbconfig;
 
+    /**
+     * @var mixed
+     */
     public $mapper;
 
     /**
@@ -23,17 +29,25 @@ class Mapper
     public function setDbConfig($type, $host, $user, $password, $database, $port = null, $socket = null)
     {
 
-        $config = new ConfigHelper;
+        $config = new DatabaseConfig;
         $config->setConfig($type, $host, $user, $password, $database, $port, $socket);
         $this->dbconfig = $config;
 
     }
 
+    /**
+     * @return array
+     */
     public function getDbConfig()
     {
         return $this->dbconfig->getConfig();
     }
 
+    /**
+     * @param null $name
+     *
+     * @return MapperFactory
+     */
     public function getMapperFactory($name = null)
     {
 
@@ -41,6 +55,10 @@ class Mapper
 
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function validateDbConnection()
     {
 
@@ -65,6 +83,12 @@ class Mapper
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return bool
+     * @throws Exception
+     */
     public function validateModel($model)
     {
 
@@ -81,6 +105,12 @@ class Mapper
         return true;
     }
 
+    /**
+     * @param $name
+     *
+     * @return mixed
+     * @throws Exception
+     */
     public function getFields($name)
     {
 
@@ -103,6 +133,12 @@ class Mapper
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return mixed
+     * @throws Exception
+     */
     public function getInfo($name)
     {
 

@@ -1,17 +1,21 @@
 <?php namespace Drivers\Database\Mysql;
 
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 use Contracts\HelperInterface;
 use mysqli;
-use Helpers\StringHelper;
 use Contracts\RepositoryInterface;
-use SebastianBergmann\Exporter\Exception;
+use Illuminate\Support\Str;
 
+/**
+ * Class MysqlRepository
+ *
+ * @package Drivers\Database\Mysql
+ */
 class MysqlRepository implements RepositoryInterface
 {
 
     /**
-     * @var \Helpers\HelperInterface $helper
+     * @var \Drivers\Database\DatabaseConfig $helper
      */
     protected $helper;
 
@@ -44,7 +48,7 @@ class MysqlRepository implements RepositoryInterface
 
     protected $db = null;
 
-    public function __construct(mysqli $mysql, ConfigHelper $config, HelperInterface $helper)
+    public function __construct(mysqli $mysql, DatabaseConfig $config, HelperInterface $helper)
     {
 
         $this->helper = $helper;
@@ -53,6 +57,9 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setDbConnection()
     {
 
@@ -68,6 +75,9 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @return boolean
+     */
     public function validateDbConnection()
     {
 
@@ -83,6 +93,9 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @return mixed
+     */
     public function getDbConnection()
     {
 
@@ -90,6 +103,11 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return mixed
+     */
     public function getTable($model)
     {
 
@@ -97,17 +115,17 @@ class MysqlRepository implements RepositoryInterface
 
             return $model;
 
-        } elseif ($this->checkForTable(StringHelper::toPlural($model))) {
+        } elseif ($this->checkForTable(Str::plural($model))) {
 
-            return StringHelper::toPlural($model);
+            return Str::plural($model);
 
-        } elseif ($this->checkForTable(StringHelper::toLower($model))) {
+        } elseif ($this->checkForTable(strtolower($model))) {
 
-            return StringHelper::toLower($model);
+            return strtolower($model);
 
-        } elseif ($this->checkForTable(StringHelper::toPlural(StringHelper::toLower($model)))) {
+        } elseif ($this->checkForTable(Str::plural(strtolower($model)))) {
 
-            return StringHelper::toPlural(StringHelper::toLower($model));
+            return Str::plural(strtolower($model));
 
         }
 
@@ -115,6 +133,11 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return boolean
+     */
     public function checkForTable($model)
     {
 
@@ -130,6 +153,9 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @return string
+     */
     public function getSchema()
     {
 
@@ -137,6 +163,11 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return mixed
+     */
     public function getColumns($model)
     {
 
@@ -152,11 +183,9 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
-    public function getTableSchemaManager()
-    {
-        return null;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getModelDates()
     {
         return null;
@@ -164,8 +193,6 @@ class MysqlRepository implements RepositoryInterface
 
     /**
      * @param $columns
-     *
-     * @access public
      *
      * @return mixed
      */
@@ -184,11 +211,21 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @param $column
+     *
+     * @return string
+     */
     public function getColumnName($column)
     {
         return $column['Field'];
     }
 
+    /**
+     * @param $column
+     *
+     * @return boolean
+     */
     public function isColumnDate($column)
     {
 
@@ -204,6 +241,11 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
+    /**
+     * @param $column
+     *
+     * @return mixed
+     */
     public function getColumnType($column)
     {
 
@@ -219,7 +261,12 @@ class MysqlRepository implements RepositoryInterface
 
     }
 
-    public function getRequired($column)
+    /**
+     * @param $column
+     *
+     * @return boolean
+     */
+    public function isRequired($column)
     {
 
         if ($column['Null'] == 'NO') {

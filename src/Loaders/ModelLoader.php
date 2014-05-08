@@ -1,11 +1,20 @@
 <?php namespace Loaders;
 
 use Contracts\ModelLoaderInterface;
-use Helpers\StringHelper;
 
+/**
+ * Class ModelLoader
+ *
+ * @package Loaders
+ */
 class ModelLoader implements ModelLoaderInterface
 {
 
+    /**
+     * @param $model
+     *
+     * @return mixed
+     */
     public function loadModel($model)
     {
 
@@ -31,12 +40,17 @@ class ModelLoader implements ModelLoaderInterface
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return string
+     */
     public function getModelNameFromPath($model)
     {
 
         if (strpos($model, "/") !== false) {
 
-            $parts = StringHelper::explodeString($model, "/");
+            $parts = explode("/", $model);
 
             return $parts[(count($parts)-1)];
 

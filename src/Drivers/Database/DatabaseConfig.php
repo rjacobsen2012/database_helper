@@ -1,22 +1,57 @@
-<?php namespace Helpers;
+<?php namespace Drivers\Database;
 
-class ConfigHelper
+/**
+ * Class DatabaseConfig
+ *
+ * @package Drivers\Database
+ */
+class DatabaseConfig
 {
 
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @var string
+     */
     protected $host = null;
 
+    /**
+     * @var string
+     */
     protected $user = null;
 
+    /**
+     * @var string
+     */
     protected $password = null;
 
+    /**
+     * @var string
+     */
     protected $database = null;
 
+    /**
+     * @var string
+     */
     protected $port = null;
 
+    /**
+     * @var string
+     */
     protected $socket = null;
 
+    /**
+     * @param string $type
+     * @param string $host
+     * @param string $user
+     * @param string $password
+     * @param string $database
+     * @param string $port
+     * @param string $socket
+     */
     public function setConfig($type, $host, $user, $password, $database, $port, $socket)
     {
 
@@ -30,6 +65,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return array
+     */
     public function getConfig()
     {
 
@@ -45,6 +83,11 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $type
+     *
+     * @throws \Exception
+     */
     public function setType($type)
     {
 
@@ -60,6 +103,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getType()
     {
 
@@ -67,6 +113,11 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $host
+     *
+     * @throws \Exception
+     */
     public function setHost($host)
     {
 
@@ -82,6 +133,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getHost()
     {
 
@@ -89,6 +143,11 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $user
+     *
+     * @throws \Exception
+     */
     public function setUser($user)
     {
 
@@ -104,6 +163,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getUser()
     {
 
@@ -111,6 +173,11 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $password
+     *
+     * @throws \Exception
+     */
     public function setPassword($password)
     {
 
@@ -126,6 +193,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getPassword()
     {
 
@@ -133,6 +203,11 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $database
+     *
+     * @throws \Exception
+     */
     public function setDatabase($database)
     {
 
@@ -148,6 +223,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getDatabase()
     {
 
@@ -155,6 +233,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $port
+     */
     public function setPort($port)
     {
 
@@ -162,6 +243,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getPort()
     {
 
@@ -169,6 +253,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @param $socket
+     */
     public function setSocket($socket)
     {
 
@@ -176,6 +263,9 @@ class ConfigHelper
 
     }
 
+    /**
+     * @return string
+     */
     public function getSocket()
     {
 

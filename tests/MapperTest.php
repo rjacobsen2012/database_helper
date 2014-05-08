@@ -2,9 +2,8 @@
 
 use Drivers\Database\DatabaseService;
 use Factories\MapperFactory;
-use Handlers\ResponseHandler;
-use Helpers\ConfigHelper;
-use Helpers\MysqlHelper;
+use Drivers\Database\DatabaseConfig;
+use Helpers\ServiceHelper;
 use \Mockery;
 
 class MapperTest extends \PHPUnit_Framework_TestCase

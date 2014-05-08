@@ -1,35 +1,92 @@
 <?php namespace Contracts;
 
-use Helpers\ConfigHelper;
-use mysqli;
-
+/**
+ * Interface RepositoryInterface
+ *
+ * @package Contracts
+ */
 interface RepositoryInterface
 {
 
+    /**
+     * @return void
+     */
     public function setDbConnection();
 
-    public function getDbConnection();
-
+    /**
+     * @return boolean
+     */
     public function validateDbConnection();
 
+    /**
+     * @return mixed
+     */
+    public function getDbConnection();
+
+    /**
+     * @param $model
+     *
+     * @return mixed
+     */
     public function getTable($model);
 
+    /**
+     * @param $model
+     *
+     * @return boolean
+     */
     public function checkForTable($model);
 
+    /**
+     * @return string
+     */
     public function getSchema();
 
+    /**
+     * @param $model
+     *
+     * @return mixed
+     */
     public function getColumns($model);
 
-    public function getTableSchemaManager();
-
+    /**
+     * @return mixed
+     */
     public function getModelDates();
 
+    /**
+     * @param $columns
+     *
+     * @return mixed
+     */
+    public function filterColumns($columns);
+
+    /**
+     * @param $column
+     *
+     * @return string
+     */
     public function getColumnName($column);
 
+    /**
+     * @param $column
+     *
+     * @return boolean
+     */
     public function isColumnDate($column);
 
+    /**
+     * @param $column
+     *
+     * @return mixed
+     */
     public function getColumnType($column);
 
-    public function getRequired($column);
+    /**
+     * @param $column
+     *
+     * @return boolean
+     */
+    public function isRequired($column);
 
 }

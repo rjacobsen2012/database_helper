@@ -1,7 +1,7 @@
 <?php namespace services;
 
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Helpers\LaravelHelper;
+use Helpers\ServiceHelper;
 use Drivers\Laravel\LaravelService;
 use \Mockery;
 
@@ -21,7 +21,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldReceive('getTable')->andReturn('companies');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $this->assertEquals('companies', $service->getModelTable());
 
     }
@@ -40,7 +40,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
 
         $this->assertEquals('companies', $service->getTable());
@@ -61,7 +61,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $schema = $service->getTableSchemaManager();
         $this->assertTrue($schema instanceof MySqlSchemaManager);
@@ -82,7 +82,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $this->assertFalse($service->validateDbConnection());
 
     }
@@ -118,7 +118,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $service->setSchema();
         $this->assertTrue($service->getSchema() instanceof MySqlSchemaManager);
@@ -157,7 +157,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $service->setSchema();
         $service->setColumns();
@@ -176,7 +176,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
         $model->shouldReceive('getDates')->andReturn($expected);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $dates = $service->getModelDates();
         $this->assertEquals($expected, $dates);
 
@@ -215,7 +215,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $service->setSchema();
         $service->setColumns();
@@ -258,7 +258,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $service->setSchema();
         $service->setColumns();
@@ -276,7 +276,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setProperty('name');
         $this->assertFalse(is_null($service->getProperty('name')));
         $this->assertTrue(is_null($service->getProperty('subdomain')));
@@ -288,7 +288,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setProperty('name');
         $service->setPropertyType('name', 'string');
         $this->assertEquals('string', $service->getPropertyType('name'));
@@ -301,11 +301,11 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setProperty('name');
         $service->setPropertyRead('name', true);
-        $this->assertTrue($service->getPropertyRead('name'));
-        $this->assertTrue(is_null($service->getPropertyRead('subdomain')));
+        $this->assertTrue($service->isPropertyRead('name'));
+        $this->assertTrue(is_null($service->isPropertyRead('subdomain')));
 
     }
 
@@ -314,11 +314,11 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setProperty('name');
         $service->setPropertyWrite('name', true);
-        $this->assertTrue($service->getPropertyWrite('name'));
-        $this->assertTrue(is_null($service->getPropertyWrite('subdomain')));
+        $this->assertTrue($service->isPropertyWrite('name'));
+        $this->assertTrue(is_null($service->isPropertyWrite('subdomain')));
 
     }
 
@@ -327,11 +327,11 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setProperty('name');
         $service->setPropertyRequired('name', true);
-        $this->assertTrue($service->getPropertyRequired('name'));
-        $this->assertTrue(is_null($service->getPropertyRequired('subdomain')));
+        $this->assertTrue($service->isPropertyRequired('name'));
+        $this->assertTrue(is_null($service->isPropertyRequired('subdomain')));
 
     }
 
@@ -340,13 +340,13 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
 
         $model = Mockery::mock('Illuminate\Database\Eloquent\Model');
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->addProperty('name', 'string', true, true, true);
         $this->assertFalse(is_null($service->getProperty('name')));
         $this->assertEquals('string', $service->getPropertyType('name'));
-        $this->assertTrue($service->getPropertyRequired('name'));
-        $this->assertTrue($service->getPropertyRead('name'));
-        $this->assertTrue($service->getPropertyWrite('name'));
+        $this->assertTrue($service->isPropertyRequired('name'));
+        $this->assertTrue($service->isPropertyRead('name'));
+        $this->assertTrue($service->isPropertyWrite('name'));
 
     }
 
@@ -405,7 +405,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
         $service->setTable();
         $service->setSchema();
         $service->setColumns();
@@ -503,7 +503,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
 
         $actual = $service->getProperties();
 
@@ -598,7 +598,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
 
         $service->setDefaults();
 
@@ -693,7 +693,7 @@ class LaravelServiceTest extends \PHPUnit_Framework_TestCase
         $model->shouldReceive('getTable')->andReturn('companies');
         $model->shouldReceive('getConnection')->andReturn($connection);
 
-        $service = new LaravelService($model, new LaravelHelper());
+        $service = new LaravelService($model, new ServiceHelper());
 
         $service->setDefaults();
 

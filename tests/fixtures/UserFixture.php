@@ -1,4 +1,4 @@
-<?php namespace fixtures;
+<?php
 
 use Illuminate\Database\Eloquent\Model;
 

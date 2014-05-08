@@ -1,10 +1,9 @@
 <?php namespace repositories;
 
-use Helpers\MysqlHelper;
+use Helpers\ServiceHelper;
 use Drivers\Database\Mysql\MysqlRepository;
-use Helpers\LaravelHelper;
 use Drivers\Laravel\LaravelService;
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 use \Mockery;
 
 class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +22,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn(true);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -51,7 +50,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $this->assertFalse(is_null($mysqlRepository->getDbConnection()));
 
@@ -62,7 +61,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $mysqli = Mockery::mock('mysqli');
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -96,7 +95,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             [
                 $mysqli,
                 $config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
@@ -120,7 +119,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $mysqli = Mockery::mock('mysqli');
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -154,7 +153,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             [
                 $mysqli,
                 $config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
@@ -183,7 +182,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
         $mysqli->num_rows = 1;
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -211,7 +210,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $found = $mysqlRepository->checkForTable($model);
         $this->assertTrue($found);
@@ -226,7 +225,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -254,7 +253,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $database = $mysqlRepository->getSchema();
         $this->assertEquals('newdb', $database);
@@ -269,7 +268,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -297,52 +296,9 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $database = $mysqlRepository->getModelDates();
-        $this->assertNull($database);
-
-    }
-
-    public function testGetTableSchemaManager()
-    {
-
-        $model = 'User';
-
-        $mysqli = Mockery::mock('\mysqli');
-        $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
-
-        $config = Mockery::mock('Helpers\ConfigHelper');
-        $config->shouldReceive('setConfig')->withArgs(
-            [
-                'mysql',
-                '123.45.567.8',
-                'someuser',
-                '1234',
-                'newdb',
-                'someport',
-                'somesocket'
-            ]
-        );
-        $config->shouldReceive('getHost')->andReturn('123.45.567.8');
-        $config->shouldReceive('getUser')->andReturn('someuser');
-        $config->shouldReceive('getPassword')->andReturn('1234');
-        $config->shouldReceive('getDatabase')->andReturn('newdb');
-        $config->shouldReceive('getPort')->andReturn('someport');
-        $config->shouldReceive('getSocket')->andReturn('somesocket');
-        $config->setConfig(
-            'mysql',
-            '123.45.567.8',
-            'someuser',
-            '1234',
-            'newdb',
-            'someport',
-            'somesocket'
-        );
-
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
-        $mysqlRepository->setDbConnection();
-        $database = $mysqlRepository->getTableSchemaManager();
         $this->assertNull($database);
 
     }
@@ -357,7 +313,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
         $mysqli->num_rows = 0;
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -385,7 +341,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $found = $mysqlRepository->checkForTable($model);
         $this->assertFalse($found);
@@ -402,7 +358,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
         $mysqli->num_rows = 1;
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -438,7 +394,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             [
                 $mysqli,
                 $config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepository->expects($this->any())
@@ -462,7 +418,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW COLUMNS FROM ".$model)->andReturn($mysqli);
         $mysqli->num_rows = 0;
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -498,7 +454,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             [
                 $mysqli,
                 $config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
@@ -580,7 +536,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn(false);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -608,7 +564,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
         $mysqlRepository->getTable('User');
         $columnsParsed = $mysqlRepository->filterColumns($mysqli);
@@ -626,7 +582,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$model."'")->andReturn($mysqli);
         $mysqli->num_rows = 1;
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -654,7 +610,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $this->assertEquals('User', $mysqlRepository->getTable('User'));
@@ -677,7 +633,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelA."'")->andReturn($mysqliA);
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -705,7 +661,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $this->assertEquals('Users', $mysqlRepository->getTable('User'));
@@ -732,7 +688,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelB."'")->andReturn($mysqliB);
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -760,7 +716,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $this->assertEquals('user', $mysqlRepository->getTable('User'));
@@ -791,7 +747,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelD."'")->andReturn($mysqliD);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -819,7 +775,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $this->assertEquals('users', $mysqlRepository->getTable('User'));
@@ -850,7 +806,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelC."'")->andReturn($mysqliC);
         $mysqli->shouldReceive('query')->with("SHOW TABLES LIKE '".$modelD."'")->andReturn($mysqliD);
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -878,7 +834,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
             'somesocket'
         );
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $this->assertNull($mysqlRepository->getTable('User'));
@@ -888,7 +844,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testGetColumnType()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -919,7 +875,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $column = ['Type' => 'varchar'];
@@ -935,7 +891,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testIsRequiredTrue()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -966,11 +922,11 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $column = ['Null' => 'NO'];
-        $required = $mysqlRepository->getRequired($column);
+        $required = $mysqlRepository->isRequired($column);
         $this->assertTrue($required);
 
     }
@@ -978,7 +934,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testIsRequiredFalse()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -1009,11 +965,11 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $column = ['Null' => 'YES'];
-        $required = $mysqlRepository->getRequired($column);
+        $required = $mysqlRepository->isRequired($column);
         $this->assertFalse($required);
 
     }
@@ -1021,7 +977,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testIsColumnDateTrue()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -1052,7 +1008,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $column = ['Type' => 'datetime'];
@@ -1068,7 +1024,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testIsColumnDateFalse()
     {
 
-        $config = Mockery::mock('Helpers\ConfigHelper');
+        $config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -1099,7 +1055,7 @@ class MysqlRepositoryTest extends \PHPUnit_Framework_TestCase
         $mysqli = Mockery::mock('\mysqli');
         $mysqli->shouldReceive('real_connect')->andReturn($mysqli);
 
-        $mysqlRepository = new MysqlRepository($mysqli, $config, new MysqlHelper());
+        $mysqlRepository = new MysqlRepository($mysqli, $config, new ServiceHelper());
         $mysqlRepository->setDbConnection();
 
         $column = ['Type' => 'varchar'];

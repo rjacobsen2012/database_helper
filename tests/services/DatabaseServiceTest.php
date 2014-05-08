@@ -1,10 +1,9 @@
 <?php namespace services;
 
 use Drivers\Database\DatabaseService;
-use Helpers\DatabaseHelper;
-use Helpers\MysqlHelper;
+use Helpers\ServiceHelper;
 use Drivers\Database\Mysql\MysqlRepository;
-use Helpers\ConfigHelper;
+use Drivers\Database\DatabaseConfig;
 use \Mockery;
 
 class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +25,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
     protected function setConfig()
     {
 
-        $this->config = Mockery::mock('Helpers\ConfigHelper');
+        $this->config = Mockery::mock('Drivers\Database\DatabaseConfig');
         $this->config->shouldReceive('setConfig')->withArgs(
             [
                 'mysql',
@@ -79,7 +78,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getColumns')
@@ -87,7 +86,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($expected);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setColumns();
         $columns = $databaseService->getColumns();
         $this->assertEquals($expected, $columns);
@@ -102,7 +101,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getTable')
@@ -110,7 +109,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('users');
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setTable();
         $table = $databaseService->getTable();
         $this->assertEquals('users', $table);
@@ -125,7 +124,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getTable')
@@ -133,7 +132,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn(null);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
 
         $this->setExpectedException('Exception');
 
@@ -161,7 +160,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getSchema')
@@ -169,7 +168,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('newdb');
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setSchema();
         $schema = $databaseService->getSchema();
         $this->assertEquals('newdb', $schema);
@@ -184,7 +183,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
@@ -195,7 +194,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'User',
-                new DatabaseHelper(),
+                new ServiceHelper(),
                 $mysqlRepository
             ]
         );
@@ -239,7 +238,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getColumns')
@@ -253,18 +252,18 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
                 'addProperty',
                 'getColumnName',
                 'getColumnType',
-                'getColumnRequired'
+                'isColumnRequired'
             ],
             [
                 'User',
-                new MysqlHelper(),
+                new ServiceHelper(),
                 $mysqlRepo
             ]
         );
         $databaseService->expects($this->any())->method('addProperty')->withAnyParameters()->willReturn([]);
         $databaseService->expects($this->any())->method('getColumnName')->withAnyParameters()->willReturn([]);
         $databaseService->expects($this->any())->method('getColumnType')->withAnyParameters()->willReturn([]);
-        $databaseService->expects($this->any())->method('getColumnRequired')->withAnyParameters()->willReturn([]);
+        $databaseService->expects($this->any())->method('isColumnRequired')->withAnyParameters()->willReturn([]);
         $databaseService->setColumns();
         $databaseService->filterTableColumns();
 
@@ -284,7 +283,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getColumnName')
@@ -292,7 +291,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($expected);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $actual = $databaseService->getColumnName($column);
         $this->assertEquals($expected, $actual);
 
@@ -306,7 +305,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('validateDbConnection')
@@ -314,7 +313,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn(false);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $this->assertFalse($databaseService->validateDbConnection());
 
     }
@@ -333,7 +332,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getColumnType')
@@ -341,7 +340,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($expected);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $actual = $databaseService->getColumnType($column);
         $this->assertEquals($expected, $actual);
 
@@ -361,16 +360,16 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
-        $mysqlRepo->shouldReceive('getRequired')
+        $mysqlRepo->shouldReceive('isRequired')
             ->with($column)
             ->once()
             ->andReturn($expected);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
-        $actual = $databaseService->getColumnRequired($column);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
+        $actual = $databaseService->isColumnRequired($column);
         $this->assertEquals($expected, $actual);
 
     }
@@ -396,11 +395,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->addProperty(
             $name,
             $type,
@@ -424,11 +423,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setProperty($name);
         $actual = $databaseService->getProperty($name);
         $this->assertEquals($expected, $actual);
@@ -445,11 +444,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setProperty('user');
         $databaseService->setPropertyType('user', 'string');
         $actual = $databaseService->getPropertyType('user');
@@ -467,14 +466,14 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setProperty('user');
         $databaseService->setPropertyRead('user', true);
-        $actual = $databaseService->getPropertyRead('user');
+        $actual = $databaseService->isPropertyRead('user');
         $this->assertEquals($expected, $actual);
 
     }
@@ -489,14 +488,14 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setProperty('user');
         $databaseService->setPropertyWrite('user', true);
-        $actual = $databaseService->getPropertyWrite('user');
+        $actual = $databaseService->isPropertyWrite('user');
         $this->assertEquals($expected, $actual);
 
     }
@@ -511,14 +510,14 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setProperty('user');
         $databaseService->setPropertyRequired('user', false);
-        $actual = $databaseService->getPropertyRequired('user');
+        $actual = $databaseService->isPropertyRequired('user');
         $this->assertEquals($expected, $actual);
 
     }
@@ -531,7 +530,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getTable')
@@ -539,31 +538,10 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('users');
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setTable();
         $table = $databaseService->getModelTable();
         $this->assertEquals('users', $table);
-
-    }
-
-    public function testGetTableSchemaManager()
-    {
-
-        $mysqlRepo = Mockery::mock(
-            'Drivers\Database\Mysql\MysqlRepository',
-            [
-                $this->mysqli,
-                $this->config,
-                new MysqlHelper()
-            ]
-        );
-        $mysqlRepo->shouldReceive('getTableSchemaManager')
-            ->withAnyArgs()
-            ->once()
-            ->andReturn(null);
-
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
-        $this->assertNull($databaseService->getTableSchemaManager());
 
     }
 
@@ -575,7 +553,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
@@ -586,7 +564,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'User',
-                new MysqlHelper(),
+                new ServiceHelper(),
                 $mysqlRepo
             ]
         );
@@ -610,7 +588,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->expects($this->any())
@@ -618,7 +596,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn(null);
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $this->assertNull($databaseService->getModelDates());
 
     }
@@ -646,11 +624,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->addProperty(
             $name,
             $type,
@@ -688,11 +666,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->addProperty(
             $name,
             $type,
@@ -736,7 +714,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 $this->mysqli,
                 $this->config,
-                new MysqlHelper()
+                new ServiceHelper()
             ]
         );
         $mysqlRepo->shouldReceive('getTable')
@@ -755,7 +733,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyArgs()
             ->once();
 
-        $databaseService = new DatabaseService('User', new MysqlHelper(), $mysqlRepo);
+        $databaseService = new DatabaseService('User', new ServiceHelper(), $mysqlRepo);
         $databaseService->setTable();
         $databaseService->setSchema();
         $databaseService->setColumns();
@@ -766,11 +744,11 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             [
                 'getColumnName',
                 'getColumnType',
-                'getColumnRequired'
+                'isColumnRequired'
             ],
             [
                 'User',
-                new MysqlHelper(),
+                new ServiceHelper(),
                 $mysqlRepo
             ]
         );
@@ -784,7 +762,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn('integer');
         $databaseService->expects($this->at(0))
-            ->method('getColumnRequired')
+            ->method('isColumnRequired')
             ->withAnyParameters()
             ->willReturn(true);
 
@@ -797,7 +775,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn('string');
         $databaseService->expects($this->at(1))
-            ->method('getColumnRequired')
+            ->method('isColumnRequired')
             ->withAnyParameters()
             ->willReturn(true);
 
@@ -810,7 +788,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn('string');
         $databaseService->expects($this->at(2))
-            ->method('getColumnRequired')
+            ->method('isColumnRequired')
             ->withAnyParameters()
             ->willReturn(false);
 
@@ -823,7 +801,7 @@ class DatabaseServiceTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->willReturn('\Carbon\Carbon');
         $databaseService->expects($this->at(3))
-            ->method('getColumnRequired')
+            ->method('isColumnRequired')
             ->withAnyParameters()
             ->willReturn(true);
 

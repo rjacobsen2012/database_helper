@@ -3,13 +3,12 @@
 use Contracts\HelperInterface;
 use Contracts\RepositoryInterface;
 use Contracts\ServicesInterface;
-use Helpers\DatabaseHelper;
 use Helpers\ServiceHelper;
 
 /**
- * Class DatabaseHelper
+ * Class DatabaseService
  *
- * @package DatabaseHelpers
+ * @package DatabaseService
  */
 class DatabaseService implements ServicesInterface
 {
@@ -68,13 +67,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
-    public function validateDbConnection()
-    {
-
-        return $this->repository->validateDbConnection();
-
-    }
-
+    /**
+     * @return void
+     */
     public function setDefaults()
     {
 
@@ -86,6 +81,19 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return boolean
+     */
+    public function validateDbConnection()
+    {
+
+        return $this->repository->validateDbConnection();
+
+    }
+
+    /**
+     * @return void
+     */
     public function setTable()
     {
 
@@ -99,6 +107,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return string
+     */
     public function getTable()
     {
 
@@ -106,6 +117,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setSchema()
     {
 
@@ -113,6 +127,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return string
+     */
     public function getSchema()
     {
 
@@ -120,6 +137,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return void
+     */
     public function setColumns()
     {
 
@@ -127,6 +147,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return mixed
+     */
     public function getColumns()
     {
 
@@ -134,6 +157,9 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @return mixed
+     */
     public function getProperties()
     {
 
@@ -142,8 +168,6 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getModelTableInfo()
@@ -154,8 +178,6 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getTableProperties()
@@ -164,9 +186,7 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function getModelTable()
     {
@@ -174,18 +194,6 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
-     * @return mixed
-     */
-    public function getTableSchemaManager()
-    {
-        return $this->repository->getTableSchemaManager();
-    }
-
-    /**
-     * @access public
-     *
      * @return mixed
      */
     public function getTableColumns()
@@ -196,8 +204,6 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @access public
-     *
      * @return mixed
      */
     public function getModelDates()
@@ -206,11 +212,7 @@ class DatabaseService implements ServicesInterface
     }
 
     /**
-     * @param $columns
-     *
-     * @access public
-     *
-     * @return mixed
+     * @return void
      */
     public function filterTableColumns()
     {
@@ -220,7 +222,7 @@ class DatabaseService implements ServicesInterface
             $this->addProperty(
                 $this->getColumnName($column),
                 $this->getColumnType($column),
-                $this->getColumnRequired($column),
+                $this->isColumnRequired($column),
                 true,
                 true
             );
@@ -232,9 +234,7 @@ class DatabaseService implements ServicesInterface
     /**
      * @param $column
      *
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function getColumnName($column)
     {
@@ -244,9 +244,7 @@ class DatabaseService implements ServicesInterface
     /**
      * @param $column
      *
-     * @access public
-     *
-     * @return mixed
+     * @return string
      */
     public function getColumnType($column)
     {
@@ -256,24 +254,21 @@ class DatabaseService implements ServicesInterface
     /**
      * @param $column
      *
-     * @access public
-     *
-     * @return mixed
+     * @return boolean
      */
-    public function getColumnRequired($column)
+    public function isColumnRequired($column)
     {
-        return $this->repository->getRequired($column);
+        return $this->repository->isRequired($column);
     }
 
     /**
      * @param      $name
-     * @param null $type
-     * @param null $read
-     * @param null $write
+     * @param string $type
+     * @param boolean $required
+     * @param boolean $read
+     * @param boolean $write
      *
-     * @access public
-     *
-     * @return mixed
+     * @return void
      */
     public function addProperty($name, $type = null, $required = false, $read = null, $write = null)
     {
@@ -284,6 +279,11 @@ class DatabaseService implements ServicesInterface
         $this->setPropertyRequired($name, $required);
     }
 
+    /**
+     * @param $name
+     *
+     * @return void
+     */
     public function setProperty($name)
     {
 
@@ -295,6 +295,11 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return string
+     */
     public function getProperty($name)
     {
 
@@ -302,6 +307,12 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @param        $name
+     * @param string $type
+     *
+     * @return void
+     */
     public function setPropertyType($name, $type = 'mixed')
     {
 
@@ -313,6 +324,11 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     *
+     * @return string
+     */
     public function getPropertyType($name)
     {
 
@@ -320,6 +336,12 @@ class DatabaseService implements ServicesInterface
 
     }
 
+    /**
+     * @param $name
+     * @param $read
+     *
+     * @return void
+     */
     public function setPropertyRead($name, $read)
     {
 
@@ -331,13 +353,24 @@ class DatabaseService implements ServicesInterface
 
     }
 
-    public function getPropertyRead($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyRead($name)
     {
 
         return $this->properties[$name]['read'];
 
     }
 
+    /**
+     * @param $name
+     * @param $write
+     *
+     * @return void
+     */
     public function setPropertyWrite($name, $write)
     {
 
@@ -349,13 +382,24 @@ class DatabaseService implements ServicesInterface
 
     }
 
-    public function getPropertyWrite($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyWrite($name)
     {
 
         return $this->properties[$name]['write'];
 
     }
 
+    /**
+     * @param $name
+     * @param $required
+     *
+     * @return void
+     */
     public function setPropertyRequired($name, $required)
     {
 
@@ -367,7 +411,12 @@ class DatabaseService implements ServicesInterface
 
     }
 
-    public function getPropertyRequired($name)
+    /**
+     * @param $name
+     *
+     * @return boolean
+     */
+    public function isPropertyRequired($name)
     {
 
         return $this->properties[$name]['required'];
