@@ -94,7 +94,11 @@ class ModelValidator implements ValidatorInterface
 
             case "laravel":
 
-                return $this->isLaravel();
+                if ($this->isLaravel()) {
+
+                    return $this->getModelLoader()->loadLaravel($this->model);
+
+                }
 
                 break;
 
@@ -113,10 +117,7 @@ class ModelValidator implements ValidatorInterface
 
         if ($this->model && $this->model instanceof Model) {
 
-            return new LaravelService(
-                $this->model,
-                new ServiceHelper()
-            );
+            return true;
 
         }
 

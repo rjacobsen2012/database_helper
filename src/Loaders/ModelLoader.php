@@ -1,6 +1,8 @@
 <?php namespace Loaders;
 
 use Contracts\ModelLoaderInterface;
+use Drivers\Laravel\LaravelService;
+use Helpers\ServiceHelper;
 
 /**
  * Class ModelLoader
@@ -57,6 +59,16 @@ class ModelLoader implements ModelLoaderInterface
         }
 
         return $model;
+
+    }
+
+    public function loadLaravel($model)
+    {
+
+        return new LaravelService(
+            $model,
+            new ServiceHelper()
+        );
 
     }
 
