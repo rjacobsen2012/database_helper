@@ -104,9 +104,15 @@ The package comes with the following defaults.
 
 To add support for a new model framework, you will need to do the following:
 
-	1. Add a new model driver under "src/Drivers". (you can use "src/Drivers/Laravel/LaravelService.php" as a guide)
+```
+	1. Add a new model driver under "src/Drivers".
+	
+		(you can use "src/Drivers/Laravel/LaravelService.php" as a guide)
+	
 	2. Add the framework to the "src/Validators/ModelValidator.php".
+	
 	3. Make sure to add tests for your new framework.
+```
 	
 When adding a new model framework, please be sure to follow [Solid](http://en.wikipedia.org/wiki/SOLID) design principles, do not have any commented out code or debug code, and be sure to comment/document your code well so I can understand what you did. This will help get your changes merged in quickly.
 
@@ -116,8 +122,18 @@ When adding a new model framework, please be sure to follow [Solid](http://en.wi
 
 To add support for a new database type, you will need to do the following:
 
-	1. Add a new database repository to "src/Drivers/Database". Simply create a directory in there for your new database type (example: "src/Drivers/Database/Postgres/PostgresRepository").
-	2. Add the repository to the valid repositories in "src/Validators/DatabaseValidator.php".
-	3. Make sure to add tests for your new database type. Along with your tests, be sure to create fixtures so the package does not need to actually connect to a database.
+```
+	1. Add a new database repository to "src/Drivers/Database". Simply create a 
+	directory in there for your new database type.
+	 
+		(example: "src/Drivers/Database/Postgres/PostgresRepository").
+	
+	2. Add the repository to the valid repositories in 
+	"src/Validators/DatabaseValidator.php".
+	
+	3. Make sure to add tests for your new database type. Along with your tests, be 
+	sure to create fixtures so the package does not need to actually connect to a 
+	database.
+```
 	
 When adding a new database type, please be sure to follow [Solid](http://en.wikipedia.org/wiki/SOLID) design principles, do not have any commented out code or debug code, and be sure to comment/document your code well so I can understand what you did. This will help get your changes merged in quickly.
