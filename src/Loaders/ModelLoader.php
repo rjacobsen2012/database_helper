@@ -62,6 +62,11 @@ class ModelLoader implements ModelLoaderInterface
 
     }
 
+    /**
+     * @param $model
+     *
+     * @return LaravelService
+     */
     public function loadLaravel($model)
     {
 
